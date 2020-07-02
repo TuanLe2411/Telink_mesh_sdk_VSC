@@ -22,6 +22,6 @@ Building tutorial:
     
   4. Load file .bin to chipset:
   
-    * USB: make flash
+    * USB: Open terminar: make flash
     
-    * EVK: using BDT tool
+    * EVK: Using BDT tool
