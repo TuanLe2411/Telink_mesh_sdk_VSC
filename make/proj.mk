@@ -92,36 +92,43 @@ $(OUT_PATH)/proj/mcu/%.o: $(TEL_PATH)/firmware/proj/mcu/%.c
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-# OUT_DIR += /proj/mcu_spec
+OUT_DIR += /proj/mcu_spec
 
-# OBJS += \
-# $(OUT_PATH)/proj/mcu_spec/adc_8263.o \
-# $(OUT_PATH)/proj/mcu_spec/adc_8266.o \
-# $(OUT_PATH)/proj/mcu_spec/adc_8267.o \
-# $(OUT_PATH)/proj/mcu_spec/cstartup_8261.o \
-# $(OUT_PATH)/proj/mcu_spec/cstartup_8263.o \
-# $(OUT_PATH)/proj/mcu_spec/cstartup_8263_ram.o \
-# $(OUT_PATH)/proj/mcu_spec/cstartup_8266.o \
-# $(OUT_PATH)/proj/mcu_spec/cstartup_8266_ram.o \
-# $(OUT_PATH)/proj/mcu_spec/cstartup_8267.o \
-# $(OUT_PATH)/proj/mcu_spec/cstartup_8267_ram.o \
-# $(OUT_PATH)/proj/mcu_spec/cstartup_8269.o \
-# $(OUT_PATH)/proj/mcu_spec/cstartup_8269_ram.o \
-# $(OUT_PATH)/proj/mcu_spec/gpio_8263.o \
-# $(OUT_PATH)/proj/mcu_spec/gpio_8266.o \
-# $(OUT_PATH)/proj/mcu_spec/gpio_8267.o \
-# $(OUT_PATH)/proj/mcu_spec/pwm_8263.o \
-# $(OUT_PATH)/proj/mcu_spec/pwm_8266.o \
-# $(OUT_PATH)/proj/mcu_spec/pwm_8267.o 
-
+OBJS += \
+$(OUT_PATH)/proj/mcu_spec/adc_8263.o \
+$(OUT_PATH)/proj/mcu_spec/adc_8266.o \
+$(OUT_PATH)/proj/mcu_spec/adc_8267.o \
+$(OUT_PATH)/proj/mcu_spec/gpio_8263.o \
+$(OUT_PATH)/proj/mcu_spec/gpio_8266.o \
+$(OUT_PATH)/proj/mcu_spec/gpio_8267.o \
+$(OUT_PATH)/proj/mcu_spec/pwm_8263.o \
+$(OUT_PATH)/proj/mcu_spec/pwm_8266.o \
+$(OUT_PATH)/proj/mcu_spec/pwm_8267.o 
 
 # Each subdirectory must supply rules for building sources it contributes
-# $(OUT_PATH)/proj/mcu_spec/%.o: $(TEL_PATH)/SDK_3.1.5/proj/mcu_spec/%.c
-# 	@echo 'Building file: $<'
-# 	@tc32-elf-gcc $(GCC_FLAGS) $(INCLUDE_PATHS) -c -o"$@" "$<"
+$(OUT_PATH)/proj/mcu_spec/%.o: $(TEL_PATH)/firmware/proj/mcu_spec/%.c
+	@echo 'Building file: $<'
+	@tc32-elf-gcc $(GCC_FLAGS) $(INCLUDE_PATHS) -c -o"$@" "$<"
 
-# proj/mcu_spec/%.o: proj/mcu_spec/%.S
-# 	@echo 'Building file: $<'
-# 	@tc32-elf-gcc $(GCC_FLAGS) $(INCLUDE_PATHS) -c -o"$@" "$<"
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+OUT_DIR += /proj/mcu_spec
+
+OBJS += \
+$(OUT_PATH)/proj/mcu_spec/cstartup_8261.o \
+$(OUT_PATH)/proj/mcu_spec/cstartup_8263.o \
+$(OUT_PATH)/proj/mcu_spec/cstartup_8263_ram.o \
+$(OUT_PATH)/proj/mcu_spec/cstartup_8266.o \
+$(OUT_PATH)/proj/mcu_spec/cstartup_8266_ram.o \
+$(OUT_PATH)/proj/mcu_spec/cstartup_8267.o \
+$(OUT_PATH)/proj/mcu_spec/cstartup_8267_ram.o \
+$(OUT_PATH)/proj/mcu_spec/cstartup_8269.o \
+$(OUT_PATH)/proj/mcu_spec/cstartup_8269_ram.o \
+
+$(OUT_PATH)/proj/mcu_spec/%.o: $(TEL_PATH)/firmware/proj/mcu_spec/%.S
+	@echo 'Building file: $<'
+	@tc32-elf-gcc $(GCC_FLAGS) $(INCLUDE_PATHS) -c -o"$@" "$<"
+
 
 

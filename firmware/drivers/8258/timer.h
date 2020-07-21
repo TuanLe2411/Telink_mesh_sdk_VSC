@@ -52,7 +52,6 @@ typedef enum{
 
 #define	    sys_tick_per_us   				16
 #define		CLOCK_SYS_CLOCK_1250US			(1250 * sys_tick_per_us)
-#define		CLOCK_SYS_CLOCK_HZ				16000000
 /**
  * @brief   system Timer : 16Mhz, Constant
  */
