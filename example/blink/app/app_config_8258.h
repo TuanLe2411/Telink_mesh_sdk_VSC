@@ -28,7 +28,7 @@ extern "C" {
 
 /////////////////// Clock  /////////////////////////////////
 #include "vendor/common/default_config.h"
-#define	  CLOCK_SYS_CLOCK_HZ	24000000
+#define	  CLOCK_SYS_CLOCK_HZ	16000000
 
 /* define led pin */
 #define PWM_R GPIO_PC4

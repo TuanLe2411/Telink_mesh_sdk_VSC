@@ -33,9 +33,15 @@ extern void app_uart_loop(void);
 /////////////////////////////////////////////////////////////////////
 // main loop flow
 /////////////////////////////////////////////////////////////////////
+
 void main_loop ()
 {
+	gpio_write(PWM_B, 1); 
+
     app_uart_loop();
+
+    gpio_write(PWM_B, 0); 
+
 }
 
 // call interrupt process 
@@ -47,6 +53,11 @@ _attribute_ram_code_ void irq_handler(void)
 void user_init()
 {
     app_uart_init();
+    
+    gpio_set_func(PWM_B, AS_GPIO);
+	gpio_set_output_en(PWM_B, 1);
+	gpio_set_input_en(PWM_B, 0); 
+	
 }
 
 void system_init()

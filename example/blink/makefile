@@ -40,7 +40,7 @@ PROJECT_PATH := .
 OUT_PATH :=$(PROJECT_PATH)/out
 
 ifneq ($(TEL_PATH)/make/makefile, $(wildcard $(TEL_PATH)/make/makefile))
-$(error "Please check if the TEL_PATH is correct")
+$(error "Please check if the TEL_PATH is correct, 请检查 TEL_PATH 是否设置正确！！！")
 endif
 
 #include the SDK makefile

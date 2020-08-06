@@ -30,7 +30,7 @@
     
 #endif
 
-#define BuffAdd     0x90
+#define BuffAdd 0x90
 
 // init uart app
 void app_uart_init(){
@@ -44,7 +44,7 @@ void app_uart_init(){
 
     // uart tx/rx pin set
 	// TB01 : UART_TX_PB1  UART_RX_PB0
-	// TB02 : UART_RX_PB0  UART_RX_PA0
+	// TB02 : UART_TX_PB0  UART_RX_PA0
     uart_gpio_set(UART_TX_PB1, UART_RX_PB0);
 
     //will reset uart digital registers from 0x90 ~ 0x9f, so uart setting must set after this reset

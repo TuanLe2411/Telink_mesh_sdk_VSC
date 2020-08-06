@@ -54,6 +54,8 @@ extern "C" {
 
 #define DEBUG_GPIO_ENABLE							0
 
+#define PWM_B GPIO_PC2
+
 #if(DEBUG_GPIO_ENABLE)
 	//define debug GPIO here according to your hardware
 	#define GPIO_CHN0							GPIO_PB0
