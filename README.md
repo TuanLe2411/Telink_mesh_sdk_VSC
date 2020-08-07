@@ -17,11 +17,14 @@ Building tutorial:
     cd example/blink
     
   3. Open terminal here:
-  
+    
+    export PATH=$PATH:/opt/tc32/bin
+    tc32-elf-gcc -v
+
     make
     
   4. Load file .bin to chipset:
   
     * USB: Open terminar: make flash
     
-    * EVK: Using BDT tool
+    * EVK: Using BDT tool(just available in windows)
