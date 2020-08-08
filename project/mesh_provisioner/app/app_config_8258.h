@@ -14,14 +14,17 @@ extern "C" {
 #include "vendor/common/default_config.h"
 
 /* Clock */
-#define	CLOCK_SYS_CLOCK_HZ	        24000000
+#define	CLOCK_SYS_CLOCK_HZ	        16000000
+#define CLOCK_SYS_CLOCK_1S          CLOCK_SYS_CLOCK_HZ,
+#define CLOCK_SYS_CLOCK_1MS         (CLOCK_SYS_CLOCK_1S / 1000)
+#define CLOCK_SYS_CLOCK_1US         (CLOCK_SYS_CLOCK_1S / 1000000)
 
 /* Extern Crystal Type */
 #define CRYSTAL_TYPE			    XTAL_12M		//  extern 12M crystal
 
 /* watchdog */
 #define MODULE_WATCHDOG_ENABLE		1
-#define WATCHDOG_INIT_TIMEOUT		2000  //ms
+#define WATCHDOG_INIT_TIMEOUT		20000  //ms
 
 /* set mesh */
 #define DONGLE_PROVISION_EN			1

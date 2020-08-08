@@ -636,7 +636,6 @@ void main_loop ()
 	proc_ui();
 	proc_led();
 	factory_reset_cnt_check();
-	
 	mesh_loop_process();
 #if ADC_ENABLE
 	static u32 adc_check_time;
