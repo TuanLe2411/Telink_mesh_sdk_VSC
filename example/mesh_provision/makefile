@@ -15,10 +15,10 @@
 #########################################################################################
 
 # Select Chip  
-TEL_CHIP := -DCHIP_TYPE=CHIP_TYPE_8258 -D__PROJECT_MESH__=1
+TEL_CHIP := -DCHIP_TYPE=CHIP_TYPE_8258 -D__PROJECT_MESH_PRO__=1 
 
 # Select link lib
-LIBS :=  -llt_8258_mesh -lsoft-fp -lsig_mesh_825x
+LIBS :=  -llt_8258_mesh -lsoft-fp -lsig_mesh_prov_825x
 
 ##########################################################################################
 #Set SDK Path , if you copy this project other dir, please set TEL_PATH absolute path
@@ -40,7 +40,7 @@ PROJECT_PATH := .
 OUT_PATH :=$(PROJECT_PATH)/out
 
 ifneq ($(TEL_PATH)/make/makefile, $(wildcard $(TEL_PATH)/make/makefile))
-$(error "Please check if the TEL_PATH is correct, 请检查 TEL_PATH 是否设置正确！！！")
+$(error "Please check if the TEL_PATH is correct")
 endif
 
 #include the SDK makefile

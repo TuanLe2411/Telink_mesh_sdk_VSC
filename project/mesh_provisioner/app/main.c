@@ -28,15 +28,38 @@
 #include "proj_lib/ble/ll/ll.h"
 
 extern void user_init();
-extern void main_loop ();
+extern void main_loop();
 
+#include "proj/drivers/uart.h"
+extern my_fifo_t hci_rx_fifo;
+u16 uart_tx_irq=0, uart_rx_irq=0;
+void uart_irq_proc(){
+	unsigned char irqS = reg_dma_rx_rdy0;
+	if(irqS & FLD_DMA_CHN_UART_RX)	
+	{
+		uart_rx_irq++;
+		reg_dma_rx_rdy0 = FLD_DMA_CHN_UART_RX;
+		u8* w = hci_rx_fifo.p + (hci_rx_fifo.wptr & (hci_rx_fifo.num-1)) * hci_rx_fifo.size;
+		if(w[0]!=0)
+		{
+			my_fifo_next(&hci_rx_fifo);
+			u8* p = hci_rx_fifo.p + (hci_rx_fifo.wptr & (hci_rx_fifo.num-1)) * hci_rx_fifo.size;
+			reg_dma0_addr = (u16)((u32)p);
+		}
+	}
 
+	if(irqS & FLD_DMA_CHN_UART_TX)	//tx
+	{
+		uart_tx_irq++;
+		reg_dma_rx_rdy0 = FLD_DMA_CHN_UART_TX;
+	}
+}
 _attribute_ram_code_ void irq_handler(void)
 {
 	irq_blt_sdk_handler ();  //ble irq proc
 
 	#if (HCI_ACCESS==HCI_USE_UART)
-							//uart process
+		uart_irq_proc();
 	#endif
 }
 

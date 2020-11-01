@@ -15,10 +15,9 @@
 #########################################################################################
 
 # Select Chip  
-TEL_CHIP := -DCHIP_TYPE=CHIP_TYPE_8258 -D__PROJECT_MESH__=1
-
+TEL_CHIP := -DCHIP_TYPE=CHIP_TYPE_8258 -D__PROJECT_MESH_PRO__=1
 # Select link lib
-LIBS :=  -llt_8258_mesh -lsoft-fp -lsig_mesh_825x
+LIBS :=  -llt_8258_mesh -lsoft-fp -lsig_mesh_prov_825x
 
 ##########################################################################################
 #Set SDK Path , if you copy this project other dir, please set TEL_PATH absolute path
@@ -26,7 +25,7 @@ LIBS :=  -llt_8258_mesh -lsoft-fp -lsig_mesh_825x
 TEL_PATH := ../..
 
 # Set Project Name
-PROJECT_NAME := 8253_provisioner
+PROJECT_NAME := mesh_provisioner
 
 # 设置下载固件的串口号
 DOWNLOAD_PORT := /dev/ttyUSB0

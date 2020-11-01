@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "memory": "c",
+        "xlocale": "c",
+        "xlocnum": "c",
+        "xmemory": "c",
+        "xutility": "c",
+        "cstdlib": "c",
+        "xlocinfo": "c",
+        "initializer_list": "cpp",
+        "type_traits": "cpp",
+        "xstring": "cpp",
+        "xiosbase": "c"
+    }
+}

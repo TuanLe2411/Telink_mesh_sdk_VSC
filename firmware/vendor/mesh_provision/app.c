@@ -267,7 +267,8 @@ u8 mesh_get_hci_tx_fifo_cnt()
 {
 #if (HCI_ACCESS == HCI_USE_USB)
 	return hci_tx_fifo.size;
-#elif (HCI_ACCESS == HCI_USE_UART)
+#elif (HCI_ACCESS == HCI_USE_UART)
+
 	return hci_tx_fifo.size-0x10;
 #else
 	return 0;

@@ -25,7 +25,8 @@
 #include "../../proj/tl_common.h"
 #include "../../vendor/mesh/app.h"
 #include "../../vendor/mesh_lpn/app.h"
-#include "../../vendor/mesh_provision/app.h"
+//#include "../../vendor/mesh_provision/app.h"
+#include "../project/mesh_provisioner/app/app.h"
 #include "../../vendor/mesh_switch/app.h"
 #include "mesh_lpn.h"
 #include "mesh_fn.h"
@@ -87,7 +88,7 @@ typedef struct ais_pri_data{
 	union{
 		u8 fmsk;
 		struct{
-			u8 ble_version:2;//00£ºBLE4.0 01£ºBLE4.2 10£ºBLE5.0 11£ºBLE5.0 above
+			u8 ble_version:2;//00ï¿½ï¿½BLE4.0 01ï¿½ï¿½BLE4.2 10ï¿½ï¿½BLE5.0 11ï¿½ï¿½BLE5.0 above
 			u8 ota_support:1;
 			u8 authen_en:1;
 			u8 secret_type:1;// 0:one device type on key, 1:one device one key

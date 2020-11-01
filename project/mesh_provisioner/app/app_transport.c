@@ -4,31 +4,30 @@
 */
 
 #include "app_transport.h"
-
 /*****************************************uart**************************************/
 
 /* uart define */
-#define uart_tx_pin         UART_TX_PD7
-#define uart_rx_pin         UART_RX_PB7
-
+trans_data_t trans_buff = {0, {0, } };
+u8 uart_hw_tx_buf[52];
 /* uart function */
-void Transceiver_init(struct Transceiver trans){
+
+void Transceiver_init(struct Transceiver trans, int Baud){
     if( trans.Name == "serial" ){
         WaitMs(100);  //leave enough time for SWS_reset when power on
-
+        u8 *uart_rx_addr = hci_rx_fifo.p + (hci_rx_fifo.wptr & (hci_rx_fifo.num-1)) * hci_rx_fifo.size;
         //note: dma addr must be set first before any other uart initialization! (confirmed by sihui)
-        uart_recbuff_init( (unsigned short *)my_fifo_wptr(&rx_fifo), MAX_LEN_DATA, (char *)&trans_buff);
+        uart_recbuff_init(uart_rx_addr, hci_rx_fifo.size, uart_hw_tx_buf);
 
         uart_gpio_set(uart_tx_pin, uart_rx_pin);// uart tx/rx pin set
 
         uart_reset();  //will reset uart digital registers from 0x90 ~ 0x9f, so uart setting must set after this reset
 
         //baud rate:
-        if(trans.Baudrate == 9600)
+        if(Baud == 9600)
             uart_init(118, 13, PARITY_NONE, STOP_BIT_ONE);
-        if(trans.Baudrate == 19200)
+        if(Baud == 19200)
             uart_init(118, 6, PARITY_NONE, STOP_BIT_ONE);
-        if(trans.Baudrate == 115200)
+        if(Baud == 115200)
             uart_init(9, 13, PARITY_NONE, STOP_BIT_ONE);
         
         uart_dma_enable(1, 1); 	//uart data in hardware buffer moved by dma, so we need enable them first
@@ -40,7 +39,7 @@ void Transceiver_init(struct Transceiver trans){
     
     if(0){
         /*
-            code for another transceive protocol 
+            code for another transceiver protocol 
         */
     }
 }
@@ -68,7 +67,7 @@ void Transceiver_print(struct Transceiver trans, char* str){
 
     if(0){
         /*
-            code for another transceive protocol 
+            code for another transceiver protocol 
         */
     }
 }
@@ -76,49 +75,50 @@ void Transceiver_print(struct Transceiver trans, char* str){
 unsigned char hextab[16] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 void Transceiver_print_hexstr(struct Transceiver trans, char* data, unsigned int len){
     if( trans.Name == "serial" ){
-        unsigned char buf[MAX_LEN_DATA] = { 0 };
+        unsigned char buf[DATA_LEN] = { 0 };
         for(int i =0; i < len; i ++)
         {
             buf[i*2] = hextab[(data[i] >> 4)];
-            buf[i*2 +1] = hextab[(data[i]&0xf)];
+            buf[i*2 +1] = hextab[(data[i]&0x0f)];
         }
         Transceiver_print(trans, (char*)buf);
     }
 
     if(0){
         /*
-            code for another transceive protocol 
+            code for another transceiver protocol 
         */
     }
 }
 
 void Transceiver_print_array(struct Transceiver trans, char* data, unsigned int len){
     if( trans.Name == "serial" ){
-        unsigned char buf[MAX_LEN_DATA] = { 0 };
+        unsigned char buf[128] = { 0 };
         for(int i =0; i < len; i ++)
         {
-            buf[i*2] = hextab[(data[i] >> 4)];
-            buf[i*2 +1] = hextab[(data[i]&0xf)];
+            buf[i*3] = hextab[(data[i] >> 4)];
+            buf[i*3 +1] = hextab[(data[i]&0xf)];
+            buf[i*3 +2] = ' ';
         }
         Transceiver_print(trans, (char*)buf);
     }
 
     if(0){
         /*
-            code for another transceive protocol 
+            code for another transceiver protocol 
         */
     }
 }
 
 void Transceiver_send(struct Transceiver trans, char* data, unsigned int len){
     if( trans.Name == "serial" ){
-        while(len > MAX_LEN_DATA)
+        while(len > DATA_LEN)
         {
-            memcpy(trans_buff.data, data,  MAX_LEN_DATA);
-            data += MAX_LEN_DATA;
-            len -= MAX_LEN_DATA;
+            memcpy(trans_buff.data, data,  DATA_LEN);
+            data += DATA_LEN;
+            len -= DATA_LEN;
 
-            trans_buff.data_length = MAX_LEN_DATA;
+            trans_buff.data_length = DATA_LEN;
 
             uart_dma_send((unsigned char*)&trans_buff);
             trans_buff.data_length = 0;
@@ -138,63 +138,23 @@ void Transceiver_send(struct Transceiver trans, char* data, unsigned int len){
 
     if(0){
         /*
-            code for another transceive protocol 
+            code for another transceiver protocol 
         */
     }
 }
 
-void Transceiver_irq_proc(struct Transceiver trans){
+void Transceiver_rec_data_print(struct Transceiver trans){
     if( trans.Name == "serial" ){
-
-        unsigned char uart_dma_irqsrc;
-        //1. UART irq
-        uart_dma_irqsrc = dma_chn_irq_status_get();///in function,interrupt flag have already been cleared,so need not to clear DMA interrupt flag here
-
-        if(uart_dma_irqsrc & FLD_DMA_CHN_UART_RX)
-        {
-            //Received uart data in rec_buff, user can copy data here
-            //u_sprintf(print_buff,"%d", rec_buff.dma_len);
-            //at_print("uart data\r\n");
-
-            u8* w = my_fifo_wptr(&rx_fifo);
-            if((w[0]!=0) || (w[1]!=0))
-            {
-                my_fifo_next(&rx_fifo); //写指针前移
-                u8* p = my_fifo_wptr(&rx_fifo); //获取当前写指针
-                reg_dma_uart_rx_addr = (u16)((u32)p);  //switch uart RX dma address
-            }
-
-            dma_chn_irq_status_clr(FLD_DMA_CHN_UART_RX);
+        rec_data_t* p = (rec_data_t *)my_fifo_get(&hci_rx_fifo);
+	    if(p){
+            Transceiver_print(trans, (char *)(p->data));
         }
-
-        if(uart_dma_irqsrc & FLD_DMA_CHN_UART_TX)
-        {
-            dma_chn_irq_status_clr(FLD_DMA_CHN_UART_TX);
-        }
+        free(p);
     }
 
     if(0){
         /*
-            code for another transceive protocol 
-        */
-    }
-}
-
-char * data = NULL;
-
-void Transceiver_loop(struct Transceiver trans){
-    if( trans.Name == "serial" ){
-
-        data = my_fifo_get(&rx_fifo);
-	    if(data != NULL){
-            
-        }
-
-    }
-
-    if(0){
-        /*
-            code for another transceive protocol 
+            code for another transceiver protocol 
         */
     }
 }

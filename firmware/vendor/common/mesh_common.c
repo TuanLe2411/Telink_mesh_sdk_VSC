@@ -2248,7 +2248,7 @@ int app_hci_cmd_from_usb_handle (u8 *buff, int n) // for both usb and uart
 	#endif
 	#if DEBUG_MESH_DONGLE_IN_VC_EN
 	else if(HCI_CMD_ADV_DEBUG_MESH_DONGLE2BEAR == type){
-		mesh_tx_cmd_add_packet(hci_data);
+		(hci_data);
 	}
 	else if(HCI_CMD_ADV_DEBUG_MESH_DONGLE2GATT == type){
 		if(mesh_is_proxy_ready()){	// is_proxy_support_and_en

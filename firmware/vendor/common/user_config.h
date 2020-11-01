@@ -60,7 +60,8 @@
 	#if(__PROJECT_MESH_GW_NODE_HK__)
 	#include "../mesh_gw_node_homekit/app_config_8258.h"
 	#else
-	#include "../mesh_provision/app_config_8258.h"
+	//#include "../mesh_provision/app_config_8258.h"
+	#include "../project/mesh_provisioner/app/app_config_8258.h"
 	#endif
 	#elif(MCU_CORE_TYPE == MCU_CORE_8278)
 	#include "../mesh_provision/app_config_8278.h"
