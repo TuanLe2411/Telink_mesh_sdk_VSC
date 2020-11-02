@@ -33,7 +33,7 @@ extern "C" {
 #define UART_PRINT_DEBUG_ENABLE     1
 
 /////////////////// Clock  /////////////////////////////////
-#define CLOCK_SYS_CLOCK_HZ  	24000000
+#define CLOCK_SYS_CLOCK_HZ  	16000000
 
 /////////////////////////////////////// PRINT DEBUG INFO ///////////////////////////////////////
 #if (UART_PRINT_DEBUG_ENABLE)

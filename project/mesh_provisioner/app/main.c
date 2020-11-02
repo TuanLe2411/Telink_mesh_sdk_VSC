@@ -72,7 +72,7 @@ _attribute_ram_code_ void irq_handler(void)
 {
 	irq_blt_sdk_handler ();  //ble irq proc
 
-	#if (HCI_ACCESS==HCI_USE_UART)
+	#if (HCI_ACCESS == HCI_USE_UART)
 		uart_irq_proc();
 	#endif
 	Serial.transceiver_irq_proc(Serial);

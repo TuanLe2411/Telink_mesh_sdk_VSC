@@ -15,7 +15,7 @@
 #########################################################################################
 
 # Select Chip  
-TEL_CHIP := -DCHIP_TYPE=CHIP_TYPE_8258 -D__PROJECT_MESH_PRO__=1 
+TEL_CHIP := -DCHIP_TYPE=CHIP_TYPE_8258 -D__PROJECT_MESH_PRO__=1
 
 # Select link lib
 LIBS :=  -llt_8258_mesh -lsoft-fp -lsig_mesh_prov_825x

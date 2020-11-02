@@ -28,10 +28,11 @@ extern "C" {
 
 #include "../../vendor/common/version.h"    // include mesh_config.h inside.
 //////////////////board sel/////////////////////////////////////
+#define PCBA_8258_USER                  0
 #define PCBA_8258_DONGLE_48PIN          1
 #define PCBA_8258_C1T139A30_V1_0        2
 #define PCBA_8258_C1T139A30_V1_2        3
-#define PCBA_8258_SEL			PCBA_8258_DONGLE_48PIN
+#define PCBA_8258_SEL			PCBA_8258_USER
 
 
 #define _USER_CONFIG_DEFINED_	1	// must define this macro to make others known
@@ -145,7 +146,11 @@ extern "C" {
 #define PWM_G       GPIO_PWM1ND3	//green
 #define PWM_B       GPIO_PWM3D2		//blue
 #define PWM_W       GPIO_PWM2ND4		//white
-
+#elif(PCBA_8258_SEL == PCBA_8258_USER)
+#define PWM_R                       GPIO_PC4 // red led
+#define PWM_G                       GPIO_PC3 // green led
+#define PWM_B                       GPIO_PC2 // blue led
+#define PWM_W                       GPIO_PB1 //white
 #endif
 
 #define PWM_FUNC_R  AS_PWM  // AS_PWM_SECOND
