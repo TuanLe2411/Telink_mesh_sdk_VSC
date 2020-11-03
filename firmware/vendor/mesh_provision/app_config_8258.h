@@ -57,11 +57,11 @@ extern "C" {
 #define HCI_USE_NONE	0
 #define HCI_USE_UART	1
 #define HCI_USE_USB		2
-#define HCI_ACCESS		HCI_USE_USB
+#define HCI_ACCESS		HCI_USE_NONE
 
 #if (HCI_ACCESS==HCI_USE_UART)
-#define UART_TX_PIN		UART_TX_PB1
-#define UART_RX_PIN		UART_RX_PB0
+#define UART_TX_PIN		UART_TX_PD7
+#define UART_RX_PIN		UART_RX_PA0
 #endif
 
 #define HCI_LOG_FW_EN   0

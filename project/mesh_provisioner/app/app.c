@@ -597,7 +597,6 @@ void user_init(){
 	blc_gap_peripheral_init();    
 	mesh_scan_rsp_init();
 	my_att_init (provision_mag.gatt_mode);
-
 	Serial.trans_init(Serial, 9600);
 	blc_att_setServerDataPendingTime_upon_ClientCmd(10);
 	extern u32 system_time_tick;

@@ -31,8 +31,6 @@
 extern void user_init();
 extern void main_loop();
 
-#include "proj/drivers/uart.h"
-extern my_fifo_t hci_rx_fifo;
 
 Transceiver Serial = {
 	.Name = "serial",
@@ -46,36 +44,40 @@ Transceiver Serial = {
 	.transceiver_loop = &Transceiver_loop
 };
 
-u16 uart_tx_irq=0, uart_rx_irq=0;
-void uart_irq_proc(){
-	unsigned char irqS = reg_dma_rx_rdy0;
-	if(irqS & FLD_DMA_CHN_UART_RX)	
-	{
-		uart_rx_irq++;
-		reg_dma_rx_rdy0 = FLD_DMA_CHN_UART_RX;
-		u8* w = hci_rx_fifo.p + (hci_rx_fifo.wptr & (hci_rx_fifo.num-1)) * hci_rx_fifo.size;
-		if(w[0]!=0)
-		{
-			my_fifo_next(&hci_rx_fifo);
-			u8* p = hci_rx_fifo.p + (hci_rx_fifo.wptr & (hci_rx_fifo.num-1)) * hci_rx_fifo.size;
-			reg_dma0_addr = (u16)((u32)p);
-		}
-	}
+// #if (HCI_ACCESS==HCI_USE_UART)
+// 	#include "proj/drivers/uart.h"
+// 	extern my_fifo_t hci_rx_fifo;
+// 	u16 uart_tx_irq=0, uart_rx_irq=0;
+// 	void uart_irq_proc(){
+// 		unsigned char irqS = reg_dma_rx_rdy0;
+// 		if(irqS & FLD_DMA_CHN_UART_RX)	
+// 		{
+// 			uart_rx_irq++;
+// 			reg_dma_rx_rdy0 = FLD_DMA_CHN_UART_RX;
+// 			u8* w = hci_rx_fifo.p + (hci_rx_fifo.wptr & (hci_rx_fifo.num-1)) * hci_rx_fifo.size;
+// 			if(w[0]!=0)
+// 			{
+// 				my_fifo_next(&hci_rx_fifo);
+// 				u8* p = hci_rx_fifo.p + (hci_rx_fifo.wptr & (hci_rx_fifo.num-1)) * hci_rx_fifo.size;
+// 				reg_dma0_addr = (u16)((u32)p);
+// 			}
+// 		}
 
-	if(irqS & FLD_DMA_CHN_UART_TX)	//tx
-	{
-		uart_tx_irq++;
-		reg_dma_rx_rdy0 = FLD_DMA_CHN_UART_TX;
-	}
-}
+// 		if(irqS & FLD_DMA_CHN_UART_TX)	//tx
+// 		{
+// 			uart_tx_irq++;
+// 			reg_dma_rx_rdy0 = FLD_DMA_CHN_UART_TX;
+// 		}
+// 	}
+// #endif
+
 _attribute_ram_code_ void irq_handler(void)
 {
 	irq_blt_sdk_handler ();  //ble irq proc
 
-	#if (HCI_ACCESS == HCI_USE_UART)
-		uart_irq_proc();
+	#if (HCI_ACCESS == HCI_USE_NONE)
+		Serial.transceiver_irq_proc(Serial);
 	#endif
-	Serial.transceiver_irq_proc(Serial);
 }
 
 	FLASH_ADDRESS_DEFINE;
