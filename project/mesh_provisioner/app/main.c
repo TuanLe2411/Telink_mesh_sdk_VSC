@@ -26,12 +26,26 @@
 #include "proj_lib/pm.h"
 #include "proj_lib/ble/blt_config.h"
 #include "proj_lib/ble/ll/ll.h"
+#include "app_transport.h"
 
 extern void user_init();
 extern void main_loop();
 
 #include "proj/drivers/uart.h"
 extern my_fifo_t hci_rx_fifo;
+
+Transceiver Serial = {
+	.Name = "serial",
+	.trans_init = &Transceiver_init,
+	.trans_print = &Transceiver_print,
+	.trans_print_hexstr = &Transceiver_print_hexstr,
+	.trans_print_array = &Transceiver_print_array,
+	.trans_send = &Transceiver_send,
+	.trans_rec_data_print = &Transceiver_rec_data_print,
+	.transceiver_irq_proc = &Transceiver_irq_proc,
+	.transceiver_loop = &Transceiver_loop
+};
+
 u16 uart_tx_irq=0, uart_rx_irq=0;
 void uart_irq_proc(){
 	unsigned char irqS = reg_dma_rx_rdy0;
@@ -61,6 +75,7 @@ _attribute_ram_code_ void irq_handler(void)
 	#if (HCI_ACCESS==HCI_USE_UART)
 		uart_irq_proc();
 	#endif
+	Serial.transceiver_irq_proc(Serial);
 }
 
 	FLASH_ADDRESS_DEFINE;

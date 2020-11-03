@@ -10,16 +10,24 @@
 #include "proj/drivers/adc.h"
 #include "proj_lib/ble/blt_config.h"
 #include "proj_lib/ble/ble_smp.h"
+#include "proj_lib/mesh_crypto/mesh_crypto.h"
 #include "proj_lib/mesh_crypto/mesh_md5.h"
-
+#include "proj_lib/mesh_crypto/sha256_telink.h"
 #include "proj_lib/sig_mesh/app_mesh.h"
 #include "proj/drivers/keyboard.h"
-#include "app.h"
+#include "vendor/mesh_provision/app.h"
 #include "stack/ble/gap/gap.h"
 #include "vendor/common/blt_soft_timer.h"
 #include "proj/drivers/rf_pa.h"
-#include "app_command.h"
 #include "app_transport.h"
+#include "vendor/common/app_beacon.h"
+#include "vendor/common/app_health.h"
+#include "vendor/common/app_provison.h"
+#include "vendor/common/app_proxy.h"
+
+#if (HCI_ACCESS==HCI_USE_UART)
+#include "proj/drivers/uart.h"
+#endif
 
 MYFIFO_INIT(blt_rxfifo, 64, 16);
 MYFIFO_INIT(blt_txfifo, 40, 32);
@@ -495,18 +503,18 @@ void main_loop(){
     proc_ui();
     proc_led();
 
+	Serial.transceiver_loop(Serial);
     mesh_loop_process();
-}
 
-Transceiver Serial = {
-	.Name = "serial",
-	.trans_init = &Transceiver_init,
-	.trans_print = &Transceiver_print,
-	.trans_print_hexstr = &Transceiver_print_hexstr,
-	.trans_print_array = &Transceiver_print_array,
-	.trans_send = &Transceiver_send,
-	.trans_rec_data_print = &Transceiver_rec_data_print,
-};
+	#if ADC_ENABLE
+	static u32 adc_check_time;
+    if(clock_time_exceed(adc_check_time, 1000*1000)){
+        adc_check_time = clock_time();
+        static u16 T_adc_val;
+        T_adc_val = adc_BatteryValueGet();
+    }  
+	#endif
+}
 
 void user_init(){
 	enable_mesh_provision_buf();
@@ -555,12 +563,20 @@ void user_init(){
     blc_hci_le_setEventMask_cmd(HCI_LE_EVT_MASK_ADVERTISING_REPORT|HCI_LE_EVT_MASK_CONNECTION_COMPLETE);
 
 	#if (HCI_ACCESS != HCI_USE_NONE)
-		#if(HCI_ACCESS == HCI_USE_UART)
-		Serial.trans_init(Serial, 9600);
-		blc_register_hci_handler (rx_from_trans_cb, blc_hci_tx_to_uart);	
+		#if (HCI_ACCESS==HCI_USE_USB)
+		//blt_set_bluetooth_version (BLUETOOTH_VER_4_2);
+		//bls_ll_setAdvChannelMap (BLT_ENABLE_ADV_ALL);
+			usb_bulk_drv_init (0);
+			blc_register_hci_handler (app_hci_cmd_from_usb, blc_hci_tx_to_usb);
+		#elif (HCI_ACCESS == HCI_USE_UART)	//uart
+			uart_drv_init();
+			blc_register_hci_handler (blc_rx_from_uart, blc_hci_tx_to_uart);		//default handler
+			//blc_register_hci_handler(rx_from_uart_cb,tx_to_uart_cb);				//customized uart handler
 		#endif
 	#endif
-
+	#if ADC_ENABLE
+		adc_drv_init();
+	#endif
 	rf_pa_init();
 	bls_app_registerEventCallback (BLT_EV_FLAG_CONNECT, (blt_event_callback_t)&mesh_ble_connect_cb);
 	blc_hci_registerControllerEventHandler(app_event_handler);
@@ -581,6 +597,8 @@ void user_init(){
 	blc_gap_peripheral_init();    
 	mesh_scan_rsp_init();
 	my_att_init (provision_mag.gatt_mode);
+
+	Serial.trans_init(Serial, 9600);
 	blc_att_setServerDataPendingTime_upon_ClientCmd(10);
 	extern u32 system_time_tick;
 	system_time_tick = clock_time();

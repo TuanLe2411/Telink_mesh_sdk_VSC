@@ -15,31 +15,35 @@ extern "C" {
 
 /* Clock */
 #define	CLOCK_SYS_CLOCK_HZ	        16000000
-#define CLOCK_SYS_CLOCK_1S          CLOCK_SYS_CLOCK_HZ,
-#define CLOCK_SYS_CLOCK_1MS         (CLOCK_SYS_CLOCK_1S / 1000)
-#define CLOCK_SYS_CLOCK_1US         (CLOCK_SYS_CLOCK_1S / 1000000)
-
+#define	USE_SYS_TICK_PER_US
+#define CLOCK_SYS_TYPE  		    CLOCK_TYPE_PLL
 /* Extern Crystal Type */
 #define CRYSTAL_TYPE			    XTAL_12M		//  extern 12M crystal
 
 /* watchdog */
 #define MODULE_WATCHDOG_ENABLE		1
-#define WATCHDOG_INIT_TIMEOUT		20000  //ms
+#define WATCHDOG_INIT_TIMEOUT		2000  //ms
 
 /* set mesh */
 #define DONGLE_PROVISION_EN			1
 #define GATEWAY_ENABLE			    1
 #define USER_INTERFACE              0
 /* uart config */
+#define HCI_USE_USB		            2
 #define HCI_USE_UART                1
 #define HCI_USE_NONE                0
-#define HCI_ACCESS                  HCI_USE_UART
+
+#if WIN32
+#define HCI_ACCESS		HCI_USE_USB
+#else
+#define HCI_ACCESS		HCI_USE_NONE
+#endif
 
 /* define led pin */
 #define PWM_R                       GPIO_PC4 // red led
 #define PWM_G                       GPIO_PC3 // green led
 #define PWM_B                       GPIO_PC2 // blue led
-#define PWM_W                       GPIO_PWM4B1		//white
+#define PWM_W                       GPIO_PB1 //white
 
 #define PWM_FUNC_R  AS_PWM  // AS_PWM_SECOND
 #define PWM_FUNC_G  AS_PWM  // AS_PWM_SECOND
@@ -78,6 +82,10 @@ extern "C" {
 #define	SW1_GPIO				GPIO_PD2
 #define	SW2_GPIO				GPIO_PD1
 #endif
+
+//pen SWS digital pullup to prevent MCU err, this is must//
+#define PA7_DATA_OUT			1
+
 
 /* Disable C linkage for C++ Compilers: */
 #if defined(__cplusplus)

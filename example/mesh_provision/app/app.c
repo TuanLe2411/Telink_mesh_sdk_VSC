@@ -40,7 +40,7 @@
 #include "vendor/common/app_proxy.h"
 #include "vendor/common/app_health.h"
 #include "proj/drivers/keyboard.h"
-#include "app.h"
+#include "vendor/mesh_provision/app.h"
 #include "stack/ble/gap/gap.h"
 #include "vendor/common/blt_soft_timer.h"
 #include "proj/drivers/rf_pa.h"

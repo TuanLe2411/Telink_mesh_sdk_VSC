@@ -7,7 +7,6 @@
 OBJS += \
 $(OUT_PATH)/app.o \
 $(OUT_PATH)/app_transport.o \
-$(OUT_PATH)/app_command.o \
 $(OUT_PATH)/app_att.o \
 $(OUT_PATH)/main.o
 
