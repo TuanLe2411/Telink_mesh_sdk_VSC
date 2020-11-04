@@ -1741,7 +1741,7 @@ Disassembly of section .vectors:
 
 00000000 <__start>:
    0:	8026      	tj.n	50 <__reset>
-   2:	32330001 	txorscc	r0, r3, #1
+   2:	32330101 	txorscc	r0, r3, #1073741824	; 0x40000000
    6:	4e4b0000 	undefined instruction 0x4e4b0000
    a:	0400544c 	tstorereq	r5, [r0], #-1100	; 0x44c
    e:	80b60088 	taddcshi	r0, r6, r8, lsl #1

@@ -22,7 +22,6 @@
 
 #include "tl_common.h"
 #include "drivers.h"
-#include "app_config.h"
 
 extern void app_uart_irq_proc(void);
 extern void app_uart_init(void);

@@ -18,7 +18,7 @@
 TEL_CHIP := -DCHIP_TYPE=CHIP_TYPE_8258 -D__PROJECT_MESH__=1
 
 # Select link lib
-LIBS :=  -llt_8258_mesh -lsoft-fp -lsig_mesh_825x
+LIBS :=  -llt_8258_mesh
 
 ##########################################################################################
 #Set SDK Path , if you copy this project other dir, please set TEL_PATH absolute path

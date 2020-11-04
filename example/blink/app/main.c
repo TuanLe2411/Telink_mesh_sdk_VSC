@@ -22,10 +22,8 @@
 
 #include "tl_common.h"
 #include "drivers.h"
-#include "vendor/common/user_config.h"
-#include "app_config_8258.h"
-
 #include "drivers/8258/gpio_8258.h"
+#include "app_config_blink.h"
 
 // define function of this pin, AS_GPIO mean gpio
 void user_init()
