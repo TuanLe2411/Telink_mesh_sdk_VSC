@@ -75,7 +75,7 @@ extern "C" {
 #define HCI_ACCESS		HCI_USE_NONE
 #endif 
 
-#if (HCI_ACCESS==HCI_USE_UART)
+#if (HCI_ACCESS == HCI_USE_UART)
 #define UART_TX_PIN		UART_TX_PB1
 #define UART_RX_PIN		UART_RX_PB0
 #endif
@@ -188,10 +188,14 @@ extern "C" {
 
 //---------------  LED / PWM
 #if(PCBA_8258_SEL == PCBA_8258_DONGLE_48PIN)
-#define PWM_R       GPIO_PWM1A3		//red
-#define PWM_G       GPIO_PWM0A2		//green
-#define PWM_B       GPIO_PWM3B0		//blue
-#define PWM_W       GPIO_PWM4B1		//white
+// #define PWM_R       GPIO_PWM1A3		//red
+// #define PWM_G       GPIO_PWM0A2		//green
+// #define PWM_B       GPIO_PWM3B0		//blue
+// #define PWM_W       GPIO_PWM4B1		//white
+#define PWM_R       GPIO_PC3		//red
+#define PWM_G       GPIO_PC4		//green
+#define PWM_B       GPIO_PC2		//blue
+#define PWM_W       GPIO_PB5		//white
 #elif(PCBA_8258_SEL == PCBA_8258_C1T139A30_V1_0)   // PCBA_8258_DEVELOPMENT_BOARD
 #define PWM_R       GPIO_PWM1ND3	//red
 #define PWM_G       GPIO_PWM2ND4	//green

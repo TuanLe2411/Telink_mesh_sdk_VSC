@@ -33,7 +33,9 @@
 	#if((MCU_CORE_TYPE == MCU_CORE_8269) || WIN32)
 	#include "../mesh/app_config_8269.h"
 	#elif(MCU_CORE_TYPE == MCU_CORE_8258)
-	#include "../mesh/app_config_8258.h"
+		#if (__PROJECT_NODE_GENERAL__)
+			#include "../project/mesh_node_general/app/app_config_8258.h"
+		#endif
 	#elif(MCU_CORE_TYPE == MCU_CORE_8278)
 	#include "../mesh/app_config_8278.h"
 	#endif

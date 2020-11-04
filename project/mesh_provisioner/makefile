@@ -16,16 +16,19 @@
 
 # Select Chip  
 TEL_CHIP := -DCHIP_TYPE=CHIP_TYPE_8258 -D__PROJECT_MESH_PRO__=1
+
 # Select link lib
 LIBS :=  -llt_8258_mesh -lsoft-fp -lsig_mesh_prov_825x
 
 ##########################################################################################
 #Set SDK Path , if you copy this project other dir, please set TEL_PATH absolute path
+#设置 SDK Path，目前使用的是相对路径，如果你将此工程复制到别的文件夹，请将TEL_PATH设为绝对路径
+# 比如： TEL_PATH := /home/ospanic/Telink_825X_SDK
 #########################################################################################
 TEL_PATH := ../..
 
 # Set Project Name
-PROJECT_NAME := mesh_provisioner
+PROJECT_NAME := mesh_provision
 
 # 设置下载固件的串口号
 DOWNLOAD_PORT := /dev/ttyUSB0

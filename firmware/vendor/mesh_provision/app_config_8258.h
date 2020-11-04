@@ -32,7 +32,7 @@ extern "C" {
 #define PCBA_8258_DONGLE_48PIN          1
 #define PCBA_8258_C1T139A30_V1_0        2
 #define PCBA_8258_C1T139A30_V1_2        3
-#define PCBA_8258_SEL			PCBA_8258_USER
+#define PCBA_8258_SEL			PCBA_8258_DONGLE_48PIN
 
 
 #define _USER_CONFIG_DEFINED_	1	// must define this macro to make others known
@@ -57,7 +57,7 @@ extern "C" {
 #define HCI_USE_NONE	0
 #define HCI_USE_UART	1
 #define HCI_USE_USB		2
-#define HCI_ACCESS		HCI_USE_NONE
+#define HCI_ACCESS		HCI_USE_UART
 
 #if (HCI_ACCESS==HCI_USE_UART)
 #define UART_TX_PIN		UART_TX_PD7
@@ -131,27 +131,11 @@ extern "C" {
 #endif
 
 //---------------  LED / PWM
-#if(PCBA_8258_SEL == PCBA_8258_DONGLE_48PIN)
-#define PWM_R       GPIO_PWM1A3		//red
-#define PWM_G       GPIO_PWM0A2		//green
-#define PWM_B       GPIO_PWM3B0		//blue
-#define PWM_W       GPIO_PWM4B1		//white
-#elif(PCBA_8258_SEL == PCBA_8258_C1T139A30_V1_0)   // PCBA_8258_DEVELOPMENT_BOARD
-#define PWM_R       GPIO_PWM1ND3	//red
-#define PWM_G       GPIO_PWM2ND4	//green
-#define PWM_B       GPIO_PD5		//blue
-#define PWM_W       GPIO_PWM3D2		//white
-#elif(PCBA_8258_SEL == PCBA_8258_C1T139A30_V1_2)
-#define PWM_R       GPIO_PD5	//red
-#define PWM_G       GPIO_PWM1ND3	//green
-#define PWM_B       GPIO_PWM3D2		//blue
-#define PWM_W       GPIO_PWM2ND4		//white
-#elif(PCBA_8258_SEL == PCBA_8258_USER)
+
 #define PWM_R                       GPIO_PC4 // red led
 #define PWM_G                       GPIO_PC3 // green led
 #define PWM_B                       GPIO_PC2 // blue led
 #define PWM_W                       GPIO_PB1 //white
-#endif
 
 #define PWM_FUNC_R  AS_PWM  // AS_PWM_SECOND
 #define PWM_FUNC_G  AS_PWM  // AS_PWM_SECOND

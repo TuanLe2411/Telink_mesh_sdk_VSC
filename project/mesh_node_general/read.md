@@ -1,0 +1,1 @@
+Project mesh_node_general just is a reference project helping create others. Do not use it in your project!
