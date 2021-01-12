@@ -1,5 +1,5 @@
 # Telink_mesh_sdk_VSC
-SDK for Telink 825x to coding ang building in VScode
+SDK for Telink 825x to coding and building in VScode
  
 Building tutorial:
   1. Download and set up TC32 toolchain, follow this link:
