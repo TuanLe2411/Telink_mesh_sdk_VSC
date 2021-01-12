@@ -15,7 +15,7 @@
 #########################################################################################
 
 # Select Chip  
-TEL_CHIP := -DCHIP_TYPE=CHIP_TYPE_8258 -D__PROJECT_MESH_LPN__=1
+TEL_CHIP := -DCHIP_TYPE=CHIP_TYPE_8258 -D__PROJECT_MESH_LPN__=1 -D__PROJECT_NODE_SENSOR__=1
 # Select link lib
 LIBS :=  -llt_8258_mesh -lsoft-fp -lsig_mesh_LPN_825x
 
@@ -25,7 +25,7 @@ LIBS :=  -llt_8258_mesh -lsoft-fp -lsig_mesh_LPN_825x
 TEL_PATH := ../..
 
 # Set Project Name
-PROJECT_NAME := mesh_node_lpn
+PROJECT_NAME := mesh_node_sensor
 
 # 设置下载固件的串口号
 DOWNLOAD_PORT := /dev/ttyUSB0

@@ -244,6 +244,98 @@ void proc_ui()
 	#endif
 }
 
+typedef struct SubAdr{
+	u16* subAdr;
+	int num;
+}SubAdr;
+
+SubAdr sub;
+
+int update_subAdr(){
+	sub.subAdr = model_sig_g_onoff_level.onoff_srv[0].com.sub_list;
+	sub.num = sizeof(model_sig_g_onoff_level.onoff_srv[0].com.sub_list)/sizeof(model_sig_g_onoff_level.onoff_srv[0].com.sub_list[0]);
+	if(sub.num == 0){
+		return 0;
+	} 
+	return 1;
+}
+
+void set_lum_to_SubAdr(int lum){
+	int ok = update_subAdr();
+	if(ok){
+		for(int i = 0; i< sub.num; i++){
+			if(sub.subAdr[i] == ADR_ALL_NODES){
+				break;
+			}
+			access_set_lum(sub.subAdr[i], 0, lum, CMD_NO_ACK);
+		}
+	}
+	return;
+}
+
+void set_onoff_to_SubAdr(char onoff){
+	int ok = update_subAdr();
+	if(ok){
+		for(int i = 0; i< sub.num; i++){
+			if(sub.subAdr[i] == ADR_ALL_NODES){
+				break;
+			}
+	    access_cmd_onoff(sub.subAdr[i], 0, onoff, CMD_NO_ACK, 0);
+		}
+	}
+	return;
+}
+
+u16 L_adc_value = 0;
+u16 C_adc_value;
+
+int convert_adc_val_to_lux(u16 dt){
+	int tm;
+	tm = (int)(dt/10);
+	return tm;
+}
+
+int lux_condition[MAX_CONDITION] = {0, 50, 100, 150, 200, 250, 300,
+								   350, 400, 450, 500};
+int span_getVal[MAX_CONDITION] = {60, 600, 1800, 3600, 7200, 14400};
+int Cond;
+int Span;
+
+void init_lux_cond(){
+	Cond = DEFAULT_CONDITION;
+	Span = DEFAULT_SPAN;
+}
+
+#if SENSOR_CONDITION
+	void update_sensor_cond(){
+		u16 temp = model_sig_sensor.sensor_states[0].setting[0].setting_raw
+		u8 loc_cond = temp && 0x00ff;
+		u8 loc_span = temp >> 8;
+		int cond = lux_condition[loc_cond];
+		int span = span_getVal[loc_span];
+		if(cond != Cond){
+			Cond = cond;
+		}
+		if(span != Span){
+			Span = span;
+		}
+		return;
+	}
+#endif
+
+void light_ctrl_process(u16 adc_data){
+	#if SENSOR_CONDITION
+		update_sensor_cond();
+	#endif
+	int c_lux = convert_adc_val_to_lux(adc_data);
+	if(c_lux >= Cond){
+		set_onoff_to_SubAdr(0);
+	}else{
+		set_onoff_to_SubAdr(1);
+		set_lum_to_SubAdr(100 - (char)(c_lux/5));
+	}
+}
+
 /////////////////////////////////////////////////////////////////////
 // main loop flow
 /////////////////////////////////////////////////////////////////////
@@ -275,15 +367,16 @@ void main_loop ()
 	
 	mesh_loop_process();
 #if ADC_ENABLE
-	static u32 adc_check_time;
-    if(clock_time_exceed(adc_check_time, 1000*1000)){
-        adc_check_time = clock_time();
+	static u32 sensor_check_time;
+    if(clock_time_exceed_s(sensor_check_time, Span)){
+        sensor_check_time = clock_time();
 		static u16 T_adc_val;
-		#if(MCU_CORE_TYPE == MCU_CORE_8269)     
-        T_adc_val = adc_BatteryValueGet();
-		#else
 		T_adc_val = adc_sample_and_get_result();
-		#endif
+		C_adc_value = T_adc_val;
+		if(L_adc_value != C_adc_value){
+			L_adc_value = C_adc_value;
+			light_ctrl_process(C_adc_value);
+		}
     }  
 #endif	
 	#if PTS_TEST_EN
@@ -401,6 +494,8 @@ void user_init()
 	blt_soft_timer_init();
 	//blt_soft_timer_add(&soft_timer_test0, 1*1000*1000);
 #endif
+
+	init_lux_cond();
 }
 
 #if (PM_DEEPSLEEP_RETENTION_ENABLE)

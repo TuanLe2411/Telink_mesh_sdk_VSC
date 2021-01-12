@@ -80,7 +80,7 @@ extern "C" {
 #define HCI_USE_NONE	0
 #define HCI_USE_UART	1
 #define HCI_USE_USB		2
-#define HCI_ACCESS		HCI_USE_NONE
+#define HCI_ACCESS		HCI_USE_UART
 
 #if (HCI_ACCESS==HCI_USE_UART)
 #define UART_TX_PIN		UART_TX_PD7
@@ -97,14 +97,14 @@ extern "C" {
 #define PRINT_DEBUG_INFO                    1
 #endif
 
-#define ADC_ENABLE		0
+#define ADC_ENABLE		1
 #if ADC_ENABLE
 #define ADC_BASE_MODE	1	//GPIO voltage
 #define ADC_VBAT_MODE	2	//Battery Voltage
 
-#define ADC_MODE		ADC_VBAT_MODE
-#define ADC_CHNM_ANA_INPUT 		GPIO_PB3 // one of ADC_GPIO_tab[]
-#define ADC_PRESCALER	ADC_PRESCALER_1F8
+#define ADC_MODE		ADC_BASE_MODE
+#define ADC_CHNM_ANA_INPUT 		GPIO_PC4 // one of ADC_GPIO_tab[]
+#define ADC_PRESCALER	ADC_PRESCALER_1F4
 #endif
 
 #if DUAL_MESH_ZB_BL_EN
@@ -177,10 +177,10 @@ extern "C" {
 
 //---------------  LED / PWM
 #if(PCBA_8258_SEL == PCBA_8258_DONGLE_48PIN)
-#define PWM_R       GPIO_PC4		//red
-#define PWM_G       GPIO_PC3		//green
-#define PWM_B       GPIO_PC2		//blue
-#define PWM_W       GPIO_PB4		//white
+#define PWM_R       GPIO_PB6		//red
+#define PWM_G       GPIO_PB6		//green
+#define PWM_B       GPIO_PB6		//blue
+#define PWM_W       GPIO_PB6		//white
 
 #endif
 
@@ -226,7 +226,11 @@ extern "C" {
 #define MODULE_WATCHDOG_ENABLE		1
 #define WATCHDOG_INIT_TIMEOUT		2000  //ms
 
-
+//////////////////Sensor//////////////////
+#define SENSOR_CONDITION 0
+#define MAX_CONDITION 100
+#define DEFAULT_CONDITION 200
+#define DEFAULT_SPAN 5        //s
 /////////////////// set default   ////////////////
 
 #include "vendor/common/default_config.h"
