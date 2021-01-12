@@ -10,6 +10,9 @@
         "initializer_list": "cpp",
         "type_traits": "cpp",
         "xstring": "cpp",
-        "xiosbase": "c"
-    }
+        "xiosbase": "c",
+        "app_proxy.h": "c",
+        "*.rh": "c"
+    },
+    "cmake.configureOnOpen": false
 }

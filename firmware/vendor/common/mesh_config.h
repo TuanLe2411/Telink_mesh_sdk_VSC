@@ -110,9 +110,9 @@ extern "C" {
 #endif
 
 #if __PROJECT_MESH_LPN__
-#define LPN_VENDOR_SENSOR_EN        0
+#define LPN_VENDOR_SENSOR_EN        1
 #else
-#define LPN_VENDOR_SENSOR_EN        0
+#define LPN_VENDOR_SENSOR_EN        1
 #endif
 
 //------------ mesh config-------------
@@ -378,9 +378,9 @@ extern "C" {
 #define MD_SCENE_EN                 1   // must 1
 #define MD_SCHEDULE_EN              1   // must 1
 #define MD_PROPERTY_EN				1	
-#define	MD_LOCATION_EN				0	// location,sensor,battery,property use same flash addr, but one sector max store 6 models				
-#define MD_SENSOR_EN				0	
-#define MD_BATTERY_EN				0
+#define	MD_LOCATION_EN				1	// location,sensor,battery,property use same flash addr, but one sector max store 6 models				
+#define MD_SENSOR_EN				1	
+#define MD_BATTERY_EN				1
 #if DEBUG_SHOW_VC_SELF_EN
 #define MD_SERVER_EN                1   // SIG and vendor MD
 #else
@@ -402,7 +402,7 @@ extern "C" {
     #else
 #define MD_SENSOR_EN				1	
     #endif
-#define MD_BATTERY_EN				0
+#define MD_BATTERY_EN				1
 
 #define MD_SERVER_EN                1   // SIG and vendor MD
 #define MD_CLIENT_EN                1   // just SIG MD
@@ -416,7 +416,7 @@ extern "C" {
 #define MD_SCHEDULE_EN              MD_TIME_EN  // because both of them save in same flash sector.
 #define MD_PROPERTY_EN				0
 #define	MD_LOCATION_EN				0	// location,sensor,battery use same flash addr, but one sector max store 6 models
-#define MD_SENSOR_EN				0	
+#define MD_SENSOR_EN				1	
 #define MD_BATTERY_EN				0
 		#if(__PROJECT_MESH_GW_NODE__)
 #define MD_SERVER_EN                1  
@@ -459,12 +459,12 @@ extern "C" {
     #else
 #define MD_POWER_ONOFF_EN           MD_DEF_TRANSIT_TIME_EN 	// because both of them save in same flash sector.
     #endif
-#define MD_TIME_EN                  0
-#define MD_SCENE_EN                 0
+#define MD_TIME_EN                  1
+#define MD_SCENE_EN                 1
 #define MD_SCHEDULE_EN              MD_TIME_EN  // because both of them save in same flash sector.
 #define MD_PROPERTY_EN				0
 #define	MD_LOCATION_EN				0	// location,sensor,battery use same flash addr, but one sector max store 6 models
-#define MD_SENSOR_EN				0	
+#define MD_SENSOR_EN				1	
 #define MD_BATTERY_EN				0
 
 #define MD_SERVER_EN                1   // SIG and vendor MD

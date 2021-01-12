@@ -28,16 +28,13 @@
 // define function of this pin, AS_GPIO mean gpio
 void user_init()
 {
-	gpio_set_func(PWM_B, AS_GPIO);
-	gpio_set_func(PWM_G, AS_GPIO);
+	
 	gpio_set_func(PWM_R, AS_GPIO);
 	
-	gpio_set_output_en(PWM_B, 1);
-	gpio_set_output_en(PWM_G, 1);
+	
 	gpio_set_output_en(PWM_R, 1);
 
-	gpio_set_input_en(PWM_B, 0); 
-	gpio_set_input_en(PWM_G, 0); 
+	
 	gpio_set_input_en(PWM_R, 0); 
 
 	/* if you want to set a button to control led, use the following code*/
@@ -79,18 +76,15 @@ void my_key_proocess()
 /////////////////////////////////////////////////////////////////////
 void main_loop ()
 {
-	gpio_write(PWM_B, 1); 
-	gpio_write(PWM_G, 0); 
+	
 	gpio_write(PWM_R, 0); 
     my_key_proocess();
 
-	gpio_write(PWM_B, 0); 
-	gpio_write(PWM_G, 1); 
+	
 	gpio_write(PWM_R, 0); 
     my_key_proocess();
 
-	gpio_write(PWM_B, 0); 
-	gpio_write(PWM_G, 0); 
+	
 	gpio_write(PWM_R, 1); 
 	my_key_proocess();
 }

@@ -26,25 +26,9 @@
 #include "proj_lib/pm.h"
 #include "proj_lib/ble/blt_config.h"
 #include "proj_lib/ble/ll/ll.h"
-#include "app_transport.h"
 
 extern void user_init();
 extern void main_loop();
-
-
-Transceiver Serial = {
-	.Name = "serial",
-	.trans_init = &Transceiver_init,
-	.trans_print = &Transceiver_print,
-	.trans_print_hexstr = &Transceiver_print_hexstr,
-	.trans_print_array = &Transceiver_print_array,
-	.trans_send = &Transceiver_send,
-	.trans_rec_data_print = &Transceiver_rec_data_print,
-	.transceiver_irq_proc = &Transceiver_irq_proc,
-	.transceiver_loop = &Transceiver_loop,
-	.transceiver_data_proc = &Transceiver_data_proc,
-	.transceiver_res_result = &Transceiver_res_result
-};
 
 #if (HCI_ACCESS == HCI_USE_UART)
 	#include "proj/drivers/uart.h"
@@ -153,7 +137,6 @@ _attribute_ram_code_ void irq_handler(void)
 		irq_gpio_handle();
 	#endif
 
-	Serial.transceiver_irq_proc(Serial);
 }
 
 FLASH_ADDRESS_DEFINE;

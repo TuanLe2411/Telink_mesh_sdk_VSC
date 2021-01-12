@@ -77,15 +77,11 @@ extern "C" {
 #define HCI_USE_UART	1
 #define HCI_USE_USB		2
 
-#if WIN32
-#define HCI_ACCESS		HCI_USE_USB
-#else
-#define HCI_ACCESS		HCI_USE_NONE
-#endif 
+#define HCI_ACCESS		HCI_USE_UART 
 
 #if (HCI_ACCESS == HCI_USE_UART)
-#define UART_TX_PIN		UART_TX_PB1
-#define UART_RX_PIN		UART_RX_PB0
+#define UART_TX_PIN		UART_TX_PD7
+#define UART_RX_PIN		UART_RX_PA0
 #endif
 
 #define HCI_LOG_FW_EN   0
@@ -214,10 +210,10 @@ extern "C" {
 
 //---------------  LED / PWM
 
-#define PWM_R       GPIO_PC3		//red
-#define PWM_G       GPIO_PC4		//green
+#define PWM_R       GPIO_PC4		//red
+#define PWM_G       GPIO_PC3		//green
 #define PWM_B       GPIO_PC2		//blue
-#define PWM_W       GPIO_PB5		//white
+#define PWM_W       GPIO_PB4		//white
 
 #define PWM_FUNC_R  AS_PWM  // AS_PWM_SECOND
 #define PWM_FUNC_G  AS_PWM  // AS_PWM_SECOND
@@ -234,7 +230,7 @@ extern "C" {
 #define PWM_INV_B   (GET_PWM_INVERT_VAL(PWM_B, PWM_FUNC_B))
 #define PWM_INV_W   (GET_PWM_INVERT_VAL(PWM_W, PWM_FUNC_W))
 
-#define GPIO_LED	PWM_R
+#define GPIO_LED	PWM_G
 
 
 /////////////open SWS digital pullup to prevent MCU err, this is must ////////////

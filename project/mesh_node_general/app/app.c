@@ -19,13 +19,13 @@
 #include "stack/ble/gap/gap.h"
 #include "vendor/common/blt_soft_timer.h"
 #include "proj/drivers/rf_pa.h"
-#include "app_transport.h"
 #include "vendor/common/app_beacon.h"
 #include "vendor/common/app_health.h"
 #include "vendor/common/app_provison.h"
 #include "vendor/common/app_proxy.h"
 #include "proj_lib/ble/l2cap.h"
 #include "proj_lib/ble/ble_common.h"
+#include "vendor/common/mesh_common.h"
 
 #if MI_API_ENABLE
 #include "mesh/mi_api/telink_sdk_mible_api.h"
@@ -328,6 +328,34 @@ void test_simu_io_user_define_proc()
     }
 }
 #endif
+u8 mesh_get_hci_tx_fifo_cnt()
+{
+#if (HCI_ACCESS == HCI_USE_USB)
+	return hci_tx_fifo.size;
+#elif (HCI_ACCESS == HCI_USE_UART)
+
+	return hci_tx_fifo.size-0x10;
+#else
+	return 0;
+#endif
+}
+
+int test(u8 *para, int n){
+	u8 fifoSize = mesh_get_hci_tx_fifo_cnt();
+	if(n > (fifoSize - 2 - 1)){ // 2: size of length,  1: size of type
+        return -1;
+    }
+    
+	u8 head[1] = {HCI_RSP_USER};
+	return my_fifo_push_hci_tx_fifo(para, n, head, 1);
+}
+
+void testHciUart(){
+	test("hello", 5);
+	test("\n\r", 1);
+	//gateway_common_cmd_rsp(0x01, "hello", 6);
+	WaitMs(200);
+}
 
 void main_loop(){
     static u32 tick_loop;
@@ -353,7 +381,6 @@ void main_loop(){
     proc_ui();
     proc_led();
 
-	Serial.transceiver_loop(Serial);
     mesh_loop_process();
 
 	#if MI_API_ENABLE
@@ -380,6 +407,8 @@ void main_loop(){
 	#if MI_SWITCH_LPN_EN
 	mi_mesh_lowpower_loop();
 	#endif
+	
+	//testHciUart();
 }
 
 #if IRQ_TIMER1_ENABLE
@@ -587,8 +616,6 @@ void user_init()
 		blt_soft_timer_init();
 		//blt_soft_timer_add(&soft_timer_test0, 200*1000);
 	#endif
-		Serial.trans_init(Serial, 9600);
-		Serial.trans_print(Serial, "        \r\nLight node\r\nready\r\n");
 }
 
 #if (PM_DEEPSLEEP_RETENTION_ENABLE)

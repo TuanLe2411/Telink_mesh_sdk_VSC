@@ -51,8 +51,8 @@ OUT_DIR += /proj/drivers
 
 OBJS += \
 $(OUT_PATH)/proj/drivers/rf_pa.o \
-$(OUT_PATH)/proj/drivers/usb.o 
-
+$(OUT_PATH)/proj/drivers/usb.o \
+$(OUT_PATH)/proj/drivers/keyboard.o
 
 # Each subdirectory must supply rules for building sources it contributes
 $(OUT_PATH)/proj/drivers/%.o: $(TEL_PATH)/firmware/proj/drivers/%.c
