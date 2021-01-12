@@ -110,9 +110,9 @@ extern "C" {
 #endif
 
 #if __PROJECT_MESH_LPN__
-#define LPN_VENDOR_SENSOR_EN        1
+#define LPN_VENDOR_SENSOR_EN        0
 #else
-#define LPN_VENDOR_SENSOR_EN        1
+#define LPN_VENDOR_SENSOR_EN        0
 #endif
 
 //------------ mesh config-------------
