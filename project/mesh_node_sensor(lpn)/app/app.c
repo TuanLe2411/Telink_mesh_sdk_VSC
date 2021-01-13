@@ -301,7 +301,7 @@ int span_getVal[MAX_CONDITION] = {60, 600, 1800, 3600, 7200, 14400};
 int Cond;
 int Span;
 
-void init_lux_cond(){
+void init_sensor_cond(){
 	Cond = DEFAULT_CONDITION;
 	Span = DEFAULT_SPAN;
 }
@@ -368,7 +368,7 @@ void main_loop ()
 	mesh_loop_process();
 #if ADC_ENABLE
 	static u32 sensor_check_time;
-    if(clock_time_exceed_s(sensor_check_time, Span)){
+    if(clock_time_exceed(sensor_check_time, Span*1000*1000)){
         sensor_check_time = clock_time();
 		static u16 T_adc_val;
 		T_adc_val = adc_sample_and_get_result();
@@ -495,7 +495,7 @@ void user_init()
 	//blt_soft_timer_add(&soft_timer_test0, 1*1000*1000);
 #endif
 
-	init_lux_cond();
+	init_sensor_cond();
 }
 
 #if (PM_DEEPSLEEP_RETENTION_ENABLE)
