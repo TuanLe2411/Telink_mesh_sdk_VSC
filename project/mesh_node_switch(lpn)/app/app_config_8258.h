@@ -28,6 +28,16 @@ extern "C" {
 
 #include "vendor/common/version.h"    // include mesh_config.h inside.
 //////////////////board sel/////////////////////////////////////
+#define PCBA_8258_DONGLE_48PIN          1
+#define PCBA_8258_C1T139A30_V1_0        2
+#define PCBA_8258_C1T139A30_V1_2        3
+#define PCBA_8258_C1T140A3_V1_1         4   // 32pin
+
+#if (MESH_USER_DEFINE_MODE == MESH_IRONMAN_MENLO_ENABLE)
+#define PCBA_8258_SEL			PCBA_8258_C1T140A3_V1_1  // PCBA_8258_DONGLE_48PIN   //
+#else
+#define PCBA_8258_SEL			PCBA_8258_DONGLE_48PIN
+#endif
 
 
 #define _USER_CONFIG_DEFINED_	1	// must define this macro to make others known
@@ -70,16 +80,20 @@ extern "C" {
 #define HCI_USE_NONE	0
 #define HCI_USE_UART	1
 #define HCI_USE_USB		2
-#define HCI_ACCESS		HCI_USE_NONE
+#define HCI_ACCESS		HCI_USE_UART
 
 #if (HCI_ACCESS==HCI_USE_UART)
-#define UART_TX_PIN		UART_TX_PB1
-#define UART_RX_PIN		UART_RX_PB0
+#define UART_TX_PIN		UART_TX_PD7
+#define UART_RX_PIN		UART_RX_PA0
 #endif
 
 #define HCI_LOG_FW_EN   0
 #if HCI_LOG_FW_EN
+	#if (MESH_USER_DEFINE_MODE == MESH_IRONMAN_MENLO_ENABLE)
+#define DEBUG_INFO_TX_PIN           		(PCBA_8258_SEL == PCBA_8258_C1T140A3_V1_1 ? GPIO_PB6 : GPIO_PD7)
+	#else
 #define DEBUG_INFO_TX_PIN           		GPIO_PB2
+	#endif
 #define PRINT_DEBUG_INFO                    1
 #endif
 
@@ -88,9 +102,9 @@ extern "C" {
 #define ADC_BASE_MODE	1	//GPIO voltage
 #define ADC_VBAT_MODE	2	//Battery Voltage
 
-#define ADC_MODE		ADC_VBAT_MODE
-#define ADC_CHNM_ANA_INPUT 		GPIO_PB3 // one of ADC_GPIO_tab[]
-#define ADC_PRESCALER	ADC_PRESCALER_1F8
+#define ADC_MODE		ADC_BASE_MODE
+#define ADC_CHNM_ANA_INPUT 		GPIO_PC4 // one of ADC_GPIO_tab[]
+#define ADC_PRESCALER	ADC_PRESCALER_1F4
 #endif
 
 #if DUAL_MESH_ZB_BL_EN
@@ -107,7 +121,7 @@ extern "C" {
 
 /////////////////// MODULE /////////////////////////////////
 #define BLE_REMOTE_PM_ENABLE			0
-#define PM_DEEPSLEEP_RETENTION_ENABLE   0
+#define PM_DEEPSLEEP_RETENTION_ENABLE   1
 #define BLE_REMOTE_SECURITY_ENABLE      0
 #define BLE_IR_ENABLE					0
 
@@ -128,18 +142,47 @@ extern "C" {
 #define STUCK_KEY_PROCESS_ENABLE		0
 #define STUCK_KEY_ENTERDEEP_TIME		60  //in s
 
-//---------------   SW_GPIO //invalid code
-#if 1
-	#define SW1_GPIO GPIO_PB1
-	#define SW2_GPIO GPIO_PB1
+//repeat key
+#define KB_REPEAT_KEY_ENABLE			0
+#define	KB_REPEAT_KEY_INTERVAL_MS		200
+#define KB_REPEAT_KEY_NUM				1
+//
+
+//----------------------- GPIO for UI --------------------------------
+#define LPN_DEBUG_PIN_EN        0
+
+//---------------  Button 
+#if (PCBA_8258_SEL == PCBA_8258_DONGLE_48PIN)
+#define PULL_WAKEUP_SRC_PD6     PM_PIN_PULLUP_1M	//btn
+#define PULL_WAKEUP_SRC_PD5     PM_PIN_PULLUP_1M	//btn
+#define PD6_INPUT_ENABLE		1
+#define PD5_INPUT_ENABLE		1
+#define	SW1_GPIO				GPIO_PD6
+#define	SW2_GPIO				GPIO_PD5
+#elif (PCBA_8258_SEL == PCBA_8258_C1T140A3_V1_1)
+#define PULL_WAKEUP_SRC_PD7     PM_PIN_PULLUP_1M	//btn
+#define PULL_WAKEUP_SRC_PA1     PM_PIN_PULLUP_1M	//btn
+#define PD7_INPUT_ENABLE		1
+#define PA1_INPUT_ENABLE		1
+#define	SW1_GPIO				GPIO_PD7
+#define	SW2_GPIO				GPIO_PA1
+#else   // PCBA_8258_C1T139A30_V1_0
+#define PULL_WAKEUP_SRC_PD2     PM_PIN_PULLUP_1M	//btn
+#define PULL_WAKEUP_SRC_PD1     PM_PIN_PULLUP_1M	//btn
+#define PD2_INPUT_ENABLE		1
+#define PD1_INPUT_ENABLE		1
+#define	SW1_GPIO				GPIO_PD2
+#define	SW2_GPIO				GPIO_PD1
 #endif
 
-//---------------  LED / PWM //invalid code
-#if 1
-#define PWM_R       GPIO_PB1	//red
-#define PWM_G       GPIO_PB1	//green
-#define PWM_B       GPIO_PB1	//blue
-#define PWM_W       GPIO_PB1	//white
+//---------------  LED / PWM
+#if(PCBA_8258_SEL == PCBA_8258_DONGLE_48PIN)
+#define PWM_R       GPIO_PB6		//red
+#define PWM_G       GPIO_PB6		//green
+#define PWM_B       GPIO_PB6		//blue
+#define PWM_W       GPIO_PB6		//white
+
+#endif
 
 #define PWM_FUNC_R  AS_PWM  // AS_PWM_SECOND
 #define PWM_FUNC_G  AS_PWM  // AS_PWM_SECOND
@@ -155,14 +198,17 @@ extern "C" {
 #define PWM_INV_G   (GET_PWM_INVERT_VAL(PWM_G, PWM_FUNC_G))
 #define PWM_INV_B   (GET_PWM_INVERT_VAL(PWM_B, PWM_FUNC_B))
 #define PWM_INV_W   (GET_PWM_INVERT_VAL(PWM_W, PWM_FUNC_W))
-#endif
 
-#define GPIO_LED	GPIO_PC4
+#define GPIO_LED	PWM_R
 
 
 /////////////open SWS digital pullup to prevent MCU err, this is must ////////////
 #define PA7_DATA_OUT			1
 
+
+//save suspend current
+#define PA5_FUNC 	AS_GPIO     // USB DM
+#define PA6_FUNC 	AS_GPIO     // USB DP
 
 /////////////////// Clock  /////////////////////////////////
 #define	USE_SYS_TICK_PER_US
@@ -180,44 +226,9 @@ extern "C" {
 #define MODULE_WATCHDOG_ENABLE		1
 #define WATCHDOG_INIT_TIMEOUT		2000  //ms
 
-
-#define	REGA_TID			0x3A
-
-#define	KB_MAP_NORMAL	{\
-							{RC_KEY_1_ON}, \
-							{RC_KEY_1_OFF},}
-
-#define		KB_MAP_NUM		KB_MAP_NORMAL
-#define		KB_MAP_FN		KB_MAP_NORMAL
-
-#define	MATRIX_ROW_PULL		PM_PIN_PULLDOWN_100K
-#define	MATRIX_COL_PULL		PM_PIN_PULLUP_10K
-#define	KB_LINE_HIGH_VALID	0
-
-#define	PM_PIN_PULL_DEFAULT	0   // 0:float, reduce sleep current
-
-#define  KB_DRIVE_PINS  {GPIO_PB4}
-#define  KB_SCAN_PINS   {GPIO_PC3, GPIO_PC2}
-
-
-#define PB4_FUNC		AS_GPIO
-
-#define PULL_WAKEUP_SRC_PB4           MATRIX_ROW_PULL
-
-#define PB4_INPUT_ENABLE		1
-
-#define PC3_FUNC		AS_GPIO
-#define PC2_FUNC 		AS_GPIO
-
-#define PULL_WAKEUP_SRC_PC2           MATRIX_COL_PULL
-#define PULL_WAKEUP_SRC_PC3           MATRIX_COL_PULL
-
-#define PC2_INPUT_ENABLE		1
-#define PC3_INPUT_ENABLE		1
-
-
-
-#define MULTI_ADDR_FOR_SWITCH_EN	0
+#define sw_on	GPIO_PC2
+#define sw_off  GPIO_PC3
+#define sw_op   GPIO_PC4
 /////////////////// set default   ////////////////
 
 #include "vendor/common/default_config.h"

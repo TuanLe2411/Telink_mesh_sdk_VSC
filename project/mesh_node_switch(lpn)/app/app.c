@@ -41,8 +41,8 @@
 #include "vendor/common/app_proxy.h"
 #include "vendor/common/app_health.h"
 #include "proj/drivers/keyboard.h"
-#include "vendor/mesh_switch/app.h"
-#include "stack/ble/gap/gap.h"
+#include "app.h"
+#include "proj_lib/ble/gap.h"
 #include "vendor/common/blt_soft_timer.h"
 #include "proj/drivers/rf_pa.h"
 
@@ -50,13 +50,8 @@
 #include "proj/drivers/uart.h"
 #endif
 
-#if AIS_ENABLE
-#define BLT_RX_BUF_NUM	16
-#else
-#define BLT_RX_BUF_NUM	8
-#endif
-MYFIFO_INIT(blt_rxfifo, 64, BLT_RX_BUF_NUM);
-MYFIFO_INIT(blt_txfifo, 40, 16);
+MYFIFO_INIT(blt_rxfifo, 64, 8);
+MYFIFO_INIT(blt_txfifo, 40, 8);
 
 //u8		peer_type;
 //u8		peer_mac[12];
@@ -66,6 +61,35 @@ MYFIFO_INIT(blt_txfifo, 40, 16);
 //////////////////////////////////////////////////////////////////////////////
 
 //----------------------- UI ---------------------------------------------
+void test_cmd_wakeup_lpn()
+{
+	static u8 test_onoff;
+	#if 0
+	u32 len = OFFSETOF(mesh_cmd_g_onoff_set_t,transit_t);	// no delay 
+	u16 adr_dst = 0xffff; // 0x0016; //0x61e1; // 0x2fe3; //
+	mesh_cmd_g_onoff_set_t cmd = {0};
+	cmd.onoff = (test_onoff++) & 1;
+	//len += 10;	// test segment;
+	mesh_tx_cmd_primary(G_ONOFF_SET_NOACK, (u8 *)&cmd, len, adr_dst, 0);
+	#else
+	access_cmd_onoff(0xffff, 0, (test_onoff++) & 1, CMD_NO_ACK, 0);
+	#endif
+}
+
+void friend_ship_establish_ok_cb_lpn()
+{
+	rf_link_light_event_callback(LGT_CMD_FRIEND_SHIP_OK);
+    friend_send_current_subsc_list();
+    #if LPN_VENDOR_SENSOR_EN
+        mesh_vd_lpn_pub_set();
+    #endif    
+}
+
+void friend_ship_disconnect_cb_lpn()
+{
+
+}
+
 #if (BLT_SOFTWARE_TIMER_ENABLE)
 /**
  * @brief   This function is soft timer callback function.
@@ -80,7 +104,6 @@ int soft_timer_test0(void)
 	return 0;
 }
 #endif
-
 
 //----------------------- handle BLE event ---------------------------------------------
 int app_event_handler (u32 h, u8 *p, int n)
@@ -173,92 +196,176 @@ int app_event_handler (u32 h, u8 *p, int n)
 
 void proc_ui()
 {
-	static u32 tick_scan, scan_io_interval_us = 4000;
-	if (!clock_time_exceed (tick_scan, scan_io_interval_us))
+	static u32 tick, scan_io_interval_us = 40000;
+	if (!clock_time_exceed (tick, scan_io_interval_us))
 	{
 		return;
 	}
-	tick_scan = clock_time();
+	tick = clock_time();
 
-	mesh_proc_keyboard();
-}
-
-rc_para_mag rc_mag;
-#if MULTI_ADDR_FOR_SWITCH_EN
-u8 multi_addr_key_flag = 0;
-#endif
-static u32  mesh_active_time;
-static u8   key_released =1;
-#define		ACTIVE_INTERVAL				32000
-#define		ADV_TIMEOUT					(30*1000) //30s
-void mesh_proc_keyboard ()
-{
-	rc_mag.adv_send_enable = 1;
-	extern kb_data_t	kb_event;
-	kb_event.keycode[0] = 0;
-	kb_event.keycode[1] = 0;
-	int det_key = kb_scan_key (0, 1);
-	///////////////////////////////////////////////////////////////////////////////////////
-	//			key change:pressed or released
-	///////////////////////////////////////////////////////////////////////////////////////
-	if (det_key) 	{
-		/////////////////////////// key pressed  /////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////
-		if (kb_event.keycode[0]) {
-			if(key_released && rc_mag.adv_timeout_def_ms == ADV_TIMEOUT){
-				rc_mag.adv_timeout_def_ms = 0;// press any key can exit adv mode.
-			}
-		    mesh_active_time = clock_time();
-			int report_flag = 1;
-			u8 cmd[11] = {0};
-			if (kb_event.keycode[0] == RC_KEY_1_ON){
-				cmd[0] = LGT_CMD_LIGHT_ON;
-			}else if (kb_event.keycode[0] == RC_KEY_1_OFF){
-				cmd[0] = LGT_CMD_LIGHT_OFF;
-			}else{
-				// invalid key
-				memset4(&kb_event, 0, sizeof(kb_event));
-				key_released = 0;
-				return;
-			}
-
-			if(report_flag){
-				vd_cmd_key_report(ADR_ALL_NODES, kb_event.keycode[0]);
-			}
-			rf_link_light_event_callback(LGT_CMD_SWITCH_CMD);
-		
-			key_released = 0;
-		}
-		///////////////////////////   key released  ///////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////
-		else {
-			key_released = 1;
-		}
+	//static u32 A_req_tick;
+	static u8 fri_request_send = 1;
+	if(fri_request_send/* || clock_time_exceed(A_req_tick, 2000*1000)*/){
+		fri_request_send = 0;
+		//A_req_tick = clock_time();
+		//if((!is_in_mesh_friend_st_lpn()) && (!fri_ship_proc_lpn.status)){
+			if(is_provision_success()){
+        		mesh_friend_ship_set_st_lpn(FRI_ST_REQUEST);
+        	}
+        //}
 	}
+
+	#if 0
+	static u8 st_sw1_last;	
+	u8 st_sw1 = !gpio_read(SW1_GPIO);
 	
-}
-
-void set_rc_flag_when_send_pkt(int is_sending)
-{
-	if(!is_sending){
-		rc_mag.rc_deep_flag =1;
+	if(!(st_sw1_last)&&st_sw1){
+	    scan_io_interval_us = 100*1000; // fix dithering
 	}
+	st_sw1_last = st_sw1;
+	#endif
 
-	rc_mag.rc_sending_flag = is_sending;
+	#if 0
+	static u8 st_sw2_last;	
+	u8 st_sw2 = !gpio_read(SW2_GPIO);
+	
+	if(!(st_sw2_last)&&st_sw2){ // dispatch just when you press the button 
+		//trigger the unprivison data packet 
+		static u8 beacon_data_num;
+		beacon_data_num =1;
+		mesh_provision_para_reset();
+		while(beacon_data_num--){
+			unprov_beacon_send(MESH_UNPROVISION_BEACON_WITH_URI,0);
+		}
+		prov_para.initial_pro_roles = MESH_INI_ROLE_NODE;
+	    scan_io_interval_us = 100*1000; // fix dithering
+	}
+	st_sw2_last = st_sw2;
+	#endif
+}
+
+typedef struct SubAdr{
+	u16* subAdr;
+	int num;
+}SubAdr;
+
+SubAdr sub;
+
+int update_subAdr(){
+	sub.subAdr = model_sig_g_onoff_level.onoff_srv[0].com.sub_list;
+	sub.num = sizeof(model_sig_g_onoff_level.onoff_srv[0].com.sub_list)/sizeof(model_sig_g_onoff_level.onoff_srv[0].com.sub_list[0]);
+	if(sub.num == 0){
+		return 0;
+	} 
+	return 1;
+}
+
+void set_lum_to_SubAdr(int lum){
+	int ok = update_subAdr();
+	if(ok){
+		for(int i = 0; i< sub.num; i++){
+			if(sub.subAdr[i] == ADR_ALL_NODES){
+				break;
+			}
+			access_set_lum(sub.subAdr[i], 0, lum, CMD_NO_ACK);
+		}
+	}
+	return;
+}
+
+void set_onoff_to_SubAdr(char onoff){
+	int ok = update_subAdr();
+	if(ok){
+		for(int i = 0; i< sub.num; i++){
+			if(sub.subAdr[i] == ADR_ALL_NODES){
+				break;
+			}
+	    access_cmd_onoff(sub.subAdr[i], 0, onoff, CMD_NO_ACK, 0);
+		}
+	}
+	return;
 }
 
 
-void led_signal(){
-	gpio_setup_up_down_resistor(GPIO_LED,PM_PIN_PULLDOWN_100K);
-	gpio_set_func(GPIO_LED,AS_GPIO);
-	gpio_set_output_en(GPIO_LED,1);
-	gpio_write(GPIO_LED,1);
-	rf_link_light_event_callback(LGT_CMD_SWITCH_POWERON);
+char sw_on_t = 0;
+char sw_off_t = 0;
+char sw_op_t = 0;
+
+char sw_on_r;
+char sw_off_r;
+char sw_op_r;
+
+void switch_init(){
+
+	gpio_set_func(sw_on, AS_GPIO);
+	gpio_set_output_en(sw_on, 0);
+	gpio_set_input_en(sw_on, 1); 
+
+	gpio_set_func(sw_off, AS_GPIO);
+	gpio_set_output_en(sw_off, 0);
+	gpio_set_input_en(sw_off, 1); 
+
+	gpio_set_func(sw_op, AS_GPIO);
+	gpio_set_output_en(sw_op, 0);
+	gpio_set_input_en(sw_op, 1); 
+
 }
 
-void test(){
-	u16 *test;
-	test = model_sig_g_onoff_level.onoff_srv[0].com.sub_list;
+
+
+void switch_scan(){
+	sw_on_r = gpio_read(sw_on);
+	sw_off_r = gpio_read(sw_off);
+	sw_op_r = gpio_read(sw_op)
+	if(sw_on_r == 0){
+		sw_on_t = 1;
+		return;
+	}
+	if(sw_off_r == 0){
+		sw_off_t = 1;
+		return;
+	}
+	if(sw_op_r == 0){
+		sw_op_r++;
+		if(sw_op_r > 1){
+			sw_op_t = 0;
+		}
+		return;
+	}
+}
+
+void switch_handle(){
+	if((sw_on_t == 0) && (sw_off_t == 0)){
+		return;
+	}
+	if(sw_on_t == 1){
+		switch (sw_op_r)
+		{
+		case 0:
+			set_onoff_to_SubAdr(1);
+			sw_on_t = 0;
+			break;
+		
+		case 1:
+			sw_on_t = 0;
+			break;
+		}
+		return;
+	}
+	if(sw_off_t == 1){
+		switch (sw_op_r)
+		{
+		case 0:
+			set_onoff_to_SubAdr(0);
+			sw_off_t = 0;
+			break;
+		
+		case 1:
+			sw_on_t = 0;
+			break;
+		}
+		return;
+	}
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -292,26 +399,28 @@ void main_loop ()
 	
 	mesh_loop_process();
 #if ADC_ENABLE
-	static u32 adc_check_time;
-	if(clock_time_exceed(adc_check_time, 1000*1000)){
-		adc_check_time = clock_time();
+	static u32 sensor_check_time;
+    if(clock_time_exceed(sensor_check_time, lightSensor.Span*1000*1000)){
+        sensor_check_time = clock_time();
 		static u16 T_adc_val;
-	#if(MCU_CORE_TYPE == MCU_CORE_8269)     
-		T_adc_val = adc_BatteryValueGet();
-	#else
 		T_adc_val = adc_sample_and_get_result();
+    }  
+#endif	
+	#if PTS_TEST_EN
+	pts_test_case_lpn();
 	#endif
-	}  
-#endif
-
-	led_signal();
+	
+	mesh_lpn_proc_suspend(); // must at last of main_loop()
+	#if LPN_VENDOR_SENSOR_EN
+    sensor_proc_loop();
+	#endif
 }
 
 void user_init()
 {
-    switch_project_flag = 1;
 	mesh_global_var_init();
 	set_blc_hci_flag_fun(0);// disable the hci part of for the lib .
+	lpn_provision_ok = is_net_key_save();
 	proc_telink_mesh_to_sig_mesh();		// must at first
 
 	#if (DUAL_MODE_ADAPT_EN)
@@ -343,9 +452,7 @@ void user_init()
 	//l2cap initialization
 	//blc_l2cap_register_handler (blc_l2cap_packet_receive);
 	blc_l2cap_register_handler (app_l2cap_packet_receive);
-	
 	///////////////////// USER application initialization ///////////////////
-
 	u8 status = bls_ll_setAdvParam( ADV_INTERVAL_MIN, ADV_INTERVAL_MAX, \
 			 	 	 	 	 	     ADV_TYPE_CONNECTABLE_UNDIRECTED, OWN_ADDRESS_PUBLIC, \
 			 	 	 	 	 	     0,  NULL,  BLT_ENABLE_ADV_ALL, ADV_FP_NONE);
@@ -399,6 +506,7 @@ void user_init()
 	#endif
 	{bls_ota_clearNewFwDataArea();	 //must
 	}
+	lpn_node_io_init();	// should be after mesh init all
 	//blc_ll_initScanning_module(tbl_mac);
 	#if((MCU_CORE_TYPE == MCU_CORE_8258) || (MCU_CORE_TYPE == MCU_CORE_8278))
 	blc_gap_peripheral_init();    //gap initialization
@@ -425,6 +533,8 @@ _attribute_ram_code_ void user_init_deepRetn(void)
 	blc_ll_recoverDeepRetention();
 
 	DBG_CHN0_HIGH;    //debug
+
+	light_pwm_init();
 #if (HCI_ACCESS == HCI_USE_UART)	//uart
 	uart_drv_init();
 #endif
@@ -432,16 +542,25 @@ _attribute_ram_code_ void user_init_deepRetn(void)
 	adc_drv_init();
 #endif
 
+    lpn_node_io_init();
+
     // should enable IRQ here, because it may use irq here, for example BLE connect.
     irq_enable();
     
-}
+    if(HANDLE_RETENTION_DEEP_PRE == lpn_deep_handle.type){
+        if(LPN_SUSPEND_EVENT_NEXT_POLL_INV == lpn_deep_handle.event){
+            suspend_handle_next_poll_interval(HANDLE_RETENTION_DEEP_AFTER);
+        }else if(LPN_SUSPEND_EVENT_WAKEUP_RX == lpn_deep_handle.event){
+            suspend_handle_wakeup_rx(HANDLE_RETENTION_DEEP_AFTER);
+        }
+    }
+    else if(HANDLE_RETENTION_DEEP_ADV_PRE == lpn_deep_handle.type){
+        suspend_handle_next_poll_interval(HANDLE_RETENTION_DEEP_ADV_PRE);
+        // while(1){}      // have been reboot if it's not BLE connected.
+    }
 
-void global_reset_new_key_wakeup()
-{
-    memset(&kb_event, 0, sizeof(kb_event));
-    global_var_no_ret_init_kb();
+    memset(&lpn_deep_handle, 0, sizeof(lpn_deep_handle)); // init
+    lpn_wakeup_tick = clock_time();
 }
-
 #endif
 

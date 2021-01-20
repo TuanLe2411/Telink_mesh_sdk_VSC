@@ -26,6 +26,9 @@
 #include "proj_lib/ble/l2cap.h"
 #include "proj_lib/ble/ble_common.h"
 
+#include "app_mesh_com.h"
+#include "app_serial.h"
+
 #if MI_API_ENABLE
 #include "mesh/mi_api/telink_sdk_mible_api.h"
 #include "mesh/mi_api/certi/mijia_profiles/mi_service_server.h"
@@ -344,87 +347,69 @@ int update_subAdr(){
 	return 1;
 }
 
-void set_lum_to_SubAdr(int lum){
-	int ok = update_subAdr();
-	if(ok){
-		for(int i = 0; i< sub.num; i++){
-			if(sub.subAdr[i] == ADR_ALL_NODES){
-				break;
-			}
-			access_set_lum(sub.subAdr[i], 0, lum, CMD_NO_ACK);
+
+
+typedef struct dim{
+	u16 L_adc_value;
+	u16 C_adc_value; 
+	int lum;
+	int delay;  //us
+	SubAdr SentAddr;
+}dim;
+
+dim Dim;
+
+void dim_init(dim *d){
+	d->delay = DEFAULT_DELAY;
+	d->C_adc_value = 0;
+	d->L_adc_value = 0;
+	return;
+}
+
+void dim_set_lum_to_SentAddr(dim *d){
+
+	for(int i = 0; i< d->SentAddr.num; i++){
+		if(d->SentAddr.subAdr[i] == ADR_ALL_NODES){
+			break;
 		}
+		set_lum_cmd(d->SentAddr.subAdr[i], d->lum);
 	}
 	return;
 }
 
-void test_set_lum(){
-	set_lum_to_SubAdr(20);
+void dim_update_SentAddr(dim *d){
+	update_subAdr();
+	d->SentAddr = sub;
 }
 
-u8 mesh_get_hci_tx_fifo_cnt()
-{
-#if (HCI_ACCESS == HCI_USE_USB)
-	return hci_tx_fifo.size;
-#elif (HCI_ACCESS == HCI_USE_UART)
-
-	return hci_tx_fifo.size-0x10;
-#else
-	return 0;
-#endif
-}
-
-int uart_print(u8 *para, int n){
-	u8 fifoSize = mesh_get_hci_tx_fifo_cnt();
-	if(n > (fifoSize - 2 - 1)){ // 2: size of length,  1: size of type
-        return -1;
-    }
-    
-	u8 head[1] = {HCI_RSP_USER};
-	return my_fifo_push_hci_tx_fifo(para, n, head, 1);
-}
-
-void uart_print_num(char num){
-	
-}
-
-void uart_test(){
-	
-}
-
-u16 L_adc_value = 0;
-u16 C_adc_value;
-
-char convert_adc_val(u16 dt){
-	char tm;
-	tm = (char)(dt/32);
-	return tm;
-}
-
-void send_adc_val(char dt){
-	uart_print(dt/100 + 0x30, 1);
-	uart_print(dt%100/10 + 0x30, 1);
-	uart_print(dt%10 + 0x30, 1);
-	uart_print("\n", 1);
-}
-
-void send_sub_adr(){
-	int ok = update_subAdr();
-	if(ok){
-		for(int i = 0; i< sub.num; i++){
-			if(sub.subAdr[i] == ADR_ALL_NODES){
-				break;
-			}
-			/*
-				add code here
-			*/
-		}
-	}
+void dim_update_lum(dim *d, int lum){
+	d->lum = lum;
 	return;
 }
 
-void send_debug_data(){
-
+void dim_sent_ctrl_cmd(dim *d){
+	dim_convert_adc_val(d);
+	dim_set_lum_to_SentAddr(d);
+	return;
 }
+
+void dim_convert_adc_val(dim *d){
+	d->lum = (char)((d->C_adc_value)/32);
+	return;
+}
+
+
+void dim_ctrl_process(dim *d, int adc_in){
+
+	dim_update_SentAddr(d);
+	d->C_adc_value = adc_in;
+	if(d->L_adc_value != d->C_adc_value){
+		d->L_adc_value = d->C_adc_value;
+		dim_convert_adc_val(d);
+		dim_sent_ctrl_cmd(d);
+	}
+}
+
 
 void main_loop(){
     static u32 tick_loop;
@@ -467,12 +452,8 @@ void main_loop(){
         adc_check_time = clock_time();
         static u16 T_adc_val;
         T_adc_val = adc_sample_and_get_result();  
-		C_adc_value = T_adc_val;
-		if(L_adc_value != C_adc_value){
-			L_adc_value = C_adc_value;
-			int dt = convert_adc_val(C_adc_value);
-			set_lum_to_SubAdr(dt);
-		}
+		dim_ctrl_process(&Dim, T_adc_val);
+	
 	}
 	
 	#endif
@@ -693,6 +674,8 @@ void user_init()
 		blt_soft_timer_init();
 		//blt_soft_timer_add(&soft_timer_test0, 200*1000);
 	#endif
+
+	dim_init(&Dim);
 }
 
 #if (PM_DEEPSLEEP_RETENTION_ENABLE)

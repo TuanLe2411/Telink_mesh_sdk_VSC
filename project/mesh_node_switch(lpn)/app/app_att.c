@@ -318,7 +318,7 @@ int proxy_gatt_Write(void *p)
 		}
 		// and then how to use the data ,make a demo to turn on or turn off the light 
 		p_bear->trans_par_val = TRANSMIT_DEF_PAR;
-		p_bear->len=proxy_para_len+1;
+		p_bear->len = proxy_para_len+1;
 		p_bear->type=MESH_ADV_TYPE_MESSAGE;
 		mesh_nw_pdu_from_gatt_handle((u8 *)p_bear);
 	}else{

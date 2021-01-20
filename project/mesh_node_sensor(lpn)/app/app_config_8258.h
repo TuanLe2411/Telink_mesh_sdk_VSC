@@ -231,6 +231,7 @@ extern "C" {
 #define MAX_CONDITION 100
 #define DEFAULT_CONDITION 200
 #define DEFAULT_SPAN 5        //s
+#define LIGHT_SENSOR_NAME "lightSensor"
 /////////////////// set default   ////////////////
 
 #include "vendor/common/default_config.h"

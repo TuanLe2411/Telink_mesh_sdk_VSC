@@ -168,7 +168,7 @@ typedef char assert_PWM_IO_is_conflicted_with_UART_IO_Please_redefine_PWM_IO[(!!
 	    #if HCI_LOG_FW_EN
 #define HCI_TX_FIFO_SIZE	(80)
         #else
-#define HCI_TX_FIFO_SIZE	(64)
+#define HCI_TX_FIFO_SIZE	(80)
         #endif
 	#endif
 	#if __PROJECT_SPIRIT_LPN__

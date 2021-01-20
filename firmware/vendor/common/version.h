@@ -63,8 +63,13 @@ format: please refer to spec "4.2.1.1 Composition Data Page 0"
     #endif
 #elif (__PROJECT_MESH_LPN__)  // must define in TC32_CC_Assember ->General , too. because cstartup.s can't read predefine value in TC32_compiler-->symbols
     #if ((MCU_CORE_TYPE == MCU_CORE_8258) || (MCU_CORE_TYPE == MCU_CORE_8278))
-#define MESH_PID_SEL		(PID_LPN)
-#define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
+        #if (__PROJECT_NODE_ONOFF_SWITCH__)
+            #define MESH_PID_SEL		(PID_SWITCH)
+            #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
+        #else
+            #define MESH_PID_SEL		(PID_LPN)
+            #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
+        #endif
     #else // if (CHIP_TYPE == CHIP_TYPE_8269)
 #define MESH_PID_SEL		(PID_LPN)
 #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
@@ -79,8 +84,13 @@ format: please refer to spec "4.2.1.1 Composition Data Page 0"
 #define MESH_PID_SEL		(PID_UNKNOW)
 #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
 #elif (__PROJECT_MESH__)   // light
-#define MESH_PID_SEL		(LIGHT_TYPE_SEL)
-#define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
+    #if (__PROJECT_NODE_DIM__)
+        #define MESH_PID_SEL		(PID_SWITCH)
+        #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
+    #else
+        #define MESH_PID_SEL		(LIGHT_TYPE_SEL)
+        #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
+    #endif
 #elif (__PROJECT_MESH_GW_NODE_HK__)   // light
 #define MESH_PID_SEL		(LIGHT_TYPE_SEL)
 #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine

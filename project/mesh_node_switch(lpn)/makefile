@@ -15,7 +15,7 @@
 #########################################################################################
 
 # Select Chip  
-TEL_CHIP := -DCHIP_TYPE=CHIP_TYPE_8258 -D__PROJECT_MESH_SWITCH__=1 -D__PROJECT_NODE_ONOFF_SWITCH__=1
+TEL_CHIP := -DCHIP_TYPE=CHIP_TYPE_8258 -D__PROJECT_MESH_LPN__=1 -D__PROJECT_NODE_ONOFF_SWITCH__=1
 # Select link lib
 LIBS :=  -llt_8258_mesh -lsoft-fp -lsig_mesh_825x
 

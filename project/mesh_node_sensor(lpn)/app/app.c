@@ -286,9 +286,6 @@ void set_onoff_to_SubAdr(char onoff){
 	return;
 }
 
-u16 L_adc_value = 0;
-u16 C_adc_value;
-
 int convert_adc_val_to_lux(u16 dt){
 	int tm;
 	tm = (int)(dt/10);
@@ -298,42 +295,57 @@ int convert_adc_val_to_lux(u16 dt){
 int lux_condition[MAX_CONDITION] = {0, 50, 100, 150, 200, 250, 300,
 								   350, 400, 450, 500};
 int span_getVal[MAX_CONDITION] = {60, 600, 1800, 3600, 7200, 14400};
-int Cond;
-int Span;
 
-void init_sensor_cond(){
-	Cond = DEFAULT_CONDITION;
-	Span = DEFAULT_SPAN;
+char ind = 0;
+typedef struct sensor{
+	char *name;
+	int Cond;
+	int Span;
+	char index;
+	u16 L_adc_value;
+	u16 C_adc_value;
+}sensor;
+
+sensor lightSensor;
+void init_sensor(sensor *s, char *name){
+	s->Cond = DEFAULT_CONDITION;
+	s->Span = DEFAULT_SPAN;
+	s->name = name;
+	s->index = ind;
+	s->L_adc_value = 0;
+	s->C_adc_value = 0;
+	ind++;
 }
 
 #if SENSOR_CONDITION
-	void update_sensor_cond(){
+	void update_sensor_cond(sensor *s){
 		u16 temp = model_sig_sensor.sensor_states[0].setting[0].setting_raw
 		u8 loc_cond = temp && 0x00ff;
 		u8 loc_span = temp >> 8;
 		int cond = lux_condition[loc_cond];
 		int span = span_getVal[loc_span];
-		if(cond != Cond){
-			Cond = cond;
+		if(cond != s->Cond){
+			s->Cond = cond;
 		}
-		if(span != Span){
-			Span = span;
+		if(span != s->Span){
+			s->Span = span;
 		}
 		return;
 	}
 #endif
 
-void light_ctrl_process(u16 adc_data){
+void light_ctrl_process(sensor s){
 	#if SENSOR_CONDITION
 		update_sensor_cond();
 	#endif
-	int c_lux = convert_adc_val_to_lux(adc_data);
-	if(c_lux >= Cond){
+	int c_lux = convert_adc_val_to_lux(s.C_adc_value);
+	if(c_lux >= s.Cond){
 		set_onoff_to_SubAdr(0);
 	}else{
 		set_onoff_to_SubAdr(1);
 		set_lum_to_SubAdr(100 - (char)(c_lux/5));
 	}
+	return;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -368,14 +380,14 @@ void main_loop ()
 	mesh_loop_process();
 #if ADC_ENABLE
 	static u32 sensor_check_time;
-    if(clock_time_exceed(sensor_check_time, Span*1000*1000)){
+    if(clock_time_exceed(sensor_check_time, lightSensor.Span*1000*1000)){
         sensor_check_time = clock_time();
 		static u16 T_adc_val;
 		T_adc_val = adc_sample_and_get_result();
-		C_adc_value = T_adc_val;
-		if(L_adc_value != C_adc_value){
-			L_adc_value = C_adc_value;
-			light_ctrl_process(C_adc_value);
+		lightSensor.C_adc_value = T_adc_val;
+		if(lightSensor.L_adc_value != lightSensor.C_adc_value){
+			lightSensor.L_adc_value = lightSensor.C_adc_value;
+			light_ctrl_process(lightSensor);
 		}
     }  
 #endif	
@@ -495,7 +507,7 @@ void user_init()
 	//blt_soft_timer_add(&soft_timer_test0, 1*1000*1000);
 #endif
 
-	init_sensor_cond();
+	init_sensor(&lightSensor, LIGHT_SENSOR_NAME);
 }
 
 #if (PM_DEEPSLEEP_RETENTION_ENABLE)

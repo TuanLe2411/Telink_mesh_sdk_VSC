@@ -262,7 +262,8 @@ extern "C" {
 #define WATCHDOG_INIT_TIMEOUT		2000  //in mi mode the watchdog timeout is 20s
 #endif
 
-
+////////////////////dim//////////////////////
+#define DEFAULT_DELAY 200 //us
 
 /////////////////// set default   ////////////////
 

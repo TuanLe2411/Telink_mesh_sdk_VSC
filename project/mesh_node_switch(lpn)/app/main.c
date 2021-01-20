@@ -27,6 +27,7 @@
 #include "proj_lib/ble/blt_config.h"
 #include "proj_lib/ble/ll/ll.h"
 #include "proj_lib/sig_mesh/app_mesh.h"
+#include "vendor/common/mesh_lpn.h"
 
 extern void user_init();
 extern void main_loop ();
@@ -69,7 +70,9 @@ _attribute_ram_code_ void irq_handler(void)
 	}else
 	#endif
 	{
+    	lpn_debug_set_irq_pin(1);
 		irq_blt_sdk_handler ();  //ble irq proc
+    	lpn_debug_set_irq_pin(0);
 	}
 
 #if (HCI_ACCESS==HCI_USE_UART)

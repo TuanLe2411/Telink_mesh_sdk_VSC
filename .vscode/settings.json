@@ -12,7 +12,8 @@
         "xstring": "cpp",
         "xiosbase": "c",
         "app_proxy.h": "c",
-        "*.rh": "c"
+        "*.rh": "c",
+        "mesh_crypto.h": "c"
     },
     "cmake.configureOnOpen": false
 }
