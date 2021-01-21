@@ -46,6 +46,9 @@
 #include "vendor/common/blt_soft_timer.h"
 #include "proj/drivers/rf_pa.h"
 
+#include "app_mesh_com.h"
+#include "app_serial.h"
+
 #if (HCI_ACCESS==HCI_USE_UART)
 #include "proj/drivers/uart.h"
 #endif
@@ -244,53 +247,6 @@ void proc_ui()
 	#endif
 }
 
-typedef struct SubAdr{
-	u16* subAdr;
-	int num;
-}SubAdr;
-
-SubAdr sub;
-
-int update_subAdr(){
-	sub.subAdr = model_sig_g_onoff_level.onoff_srv[0].com.sub_list;
-	sub.num = sizeof(model_sig_g_onoff_level.onoff_srv[0].com.sub_list)/sizeof(model_sig_g_onoff_level.onoff_srv[0].com.sub_list[0]);
-	if(sub.num == 0){
-		return 0;
-	} 
-	return 1;
-}
-
-void set_lum_to_SubAdr(int lum){
-	int ok = update_subAdr();
-	if(ok){
-		for(int i = 0; i< sub.num; i++){
-			if(sub.subAdr[i] == ADR_ALL_NODES){
-				break;
-			}
-			access_set_lum(sub.subAdr[i], 0, lum, CMD_NO_ACK);
-		}
-	}
-	return;
-}
-
-void set_onoff_to_SubAdr(char onoff){
-	int ok = update_subAdr();
-	if(ok){
-		for(int i = 0; i< sub.num; i++){
-			if(sub.subAdr[i] == ADR_ALL_NODES){
-				break;
-			}
-	    access_cmd_onoff(sub.subAdr[i], 0, onoff, CMD_NO_ACK, 0);
-		}
-	}
-	return;
-}
-
-int convert_adc_val_to_lux(u16 dt){
-	int tm;
-	tm = (int)(dt/10);
-	return tm;
-}
 
 int lux_condition[MAX_CONDITION] = {0, 50, 100, 150, 200, 250, 300,
 								   350, 400, 450, 500};
@@ -298,23 +254,57 @@ int span_getVal[MAX_CONDITION] = {60, 600, 1800, 3600, 7200, 14400};
 
 char ind = 0;
 typedef struct sensor{
-	char *name;
+	char sensor_type;
 	int Cond;
 	int Span;
+	int sensor_dt;
 	char index;
 	u16 L_adc_value;
 	u16 C_adc_value;
+	SubAdr SentAddr;
 }sensor;
 
 sensor lightSensor;
-void init_sensor(sensor *s, char *name){
+void init_sensor(sensor *s, char type){
 	s->Cond = DEFAULT_CONDITION;
 	s->Span = DEFAULT_SPAN;
-	s->name = name;
+	s->sensor_type = type;
 	s->index = ind;
 	s->L_adc_value = 0;
 	s->C_adc_value = 0;
 	ind++;
+}
+
+void sensor_set_lum_to_SentAdr(sensor *s, int lum){
+		for(int i = 0; i< s->SentAddr.num; i++){
+			if(s->SentAddr.subAdr[i] == ADR_ALL_NODES){
+				break;
+			}
+			mesh_set_lum_cmd(s->SentAddr.subAdr[i], lum);
+		}
+	
+	return;
+}
+
+void sensor_set_onoff_to_SentAdr(sensor *s, char onoff){
+	
+		for(int i = 0; i< s->SentAddr.num; i++){
+			if(s->SentAddr.subAdr[i] == ADR_ALL_NODES){
+				break;
+			}
+	    	mesh_send_onoff_cmd(s->SentAddr.subAdr[i], onoff);
+		}
+	
+	return;
+}
+
+void sensor_update_SentAddr(sensor *s){
+	s->SentAddr = mesh_get_sub_addr();
+}
+
+void sensor_update_sensor_data(sensor *s){
+	s->sensor_dt = (int)((s->C_adc_value)/10);
+	return;
 }
 
 #if SENSOR_CONDITION
@@ -334,17 +324,23 @@ void init_sensor(sensor *s, char *name){
 	}
 #endif
 
-void light_ctrl_process(sensor s){
+void light_ctrl_process(sensor *s, int adc_data){
+	sensor_update_SentAddr(s);
 	#if SENSOR_CONDITION
-		update_sensor_cond();
+		update_sensor_cond(s);
 	#endif
-	int c_lux = convert_adc_val_to_lux(s.C_adc_value);
-	if(c_lux >= s.Cond){
-		set_onoff_to_SubAdr(0);
-	}else{
-		set_onoff_to_SubAdr(1);
-		set_lum_to_SubAdr(100 - (char)(c_lux/5));
-	}
+		s->C_adc_value = adc_data;
+		if(s->L_adc_value != s->C_adc_value){
+			s->L_adc_value = s->C_adc_value;
+			sensor_update_sensor_data(s);
+			if(s->sensor_dt >= s->Cond){
+				sensor_set_onoff_to_SentAdr(s, 0);
+			}else{
+				sensor_set_onoff_to_SentAdr(s, 1);
+				sensor_set_lum_to_SentAdr(s, 100 - (char)((s->sensor_dt)/5));
+			}
+		}
+	
 	return;
 }
 
@@ -384,11 +380,7 @@ void main_loop ()
         sensor_check_time = clock_time();
 		static u16 T_adc_val;
 		T_adc_val = adc_sample_and_get_result();
-		lightSensor.C_adc_value = T_adc_val;
-		if(lightSensor.L_adc_value != lightSensor.C_adc_value){
-			lightSensor.L_adc_value = lightSensor.C_adc_value;
-			light_ctrl_process(lightSensor);
-		}
+		light_ctrl_process(&lightSensor, T_adc_val);
     }  
 #endif	
 	#if PTS_TEST_EN
@@ -507,7 +499,7 @@ void user_init()
 	//blt_soft_timer_add(&soft_timer_test0, 1*1000*1000);
 #endif
 
-	init_sensor(&lightSensor, LIGHT_SENSOR_NAME);
+	init_sensor(&lightSensor, LIGHT_SENSOR_TYPE);
 }
 
 #if (PM_DEEPSLEEP_RETENTION_ENABLE)

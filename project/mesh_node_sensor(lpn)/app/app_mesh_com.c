@@ -6,8 +6,8 @@
 SubAdr sub;
 
 int get_subAdr(){
-	sub.subAdr = model_sig_g_onoff_level.level_clnt[0].com.sub_list;
-	sub.num = sizeof(model_sig_g_onoff_level.level_clnt[0].com.sub_list)/sizeof(model_sig_g_onoff_level.level_clnt[0].com.sub_list[0]);
+	sub.subAdr = model_sig_g_onoff_level.onoff_srv[0].com.sub_list;
+	sub.num = sizeof(model_sig_g_onoff_level.onoff_srv[0].com.sub_list)/sizeof(model_sig_g_onoff_level.onoff_srv[0].com.sub_list[0]);
 	if(sub.num == 0){
 		return 0;
 	} 

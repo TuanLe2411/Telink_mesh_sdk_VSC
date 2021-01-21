@@ -9,7 +9,7 @@
 
 meshHandle MeshHandle;
 
-void mesh_light_command_handle(char *dt, unsigned int len){
+void mesh_light_command_handle(unsigned char *dt, unsigned int len){
     unsigned char mesh_light_cmd_type = dt[0];
     unsigned int mesh_light_cmd_len = len - MESH_CMD_LIGHT_TYPE_LEN;
     unsigned char *mesh_light_cmd_data = dt + MESH_CMD_LIGHT_TYPE_LEN;
@@ -23,7 +23,7 @@ void mesh_light_command_handle(char *dt, unsigned int len){
     return;
 }
 
-void mesh_command_handle(char *dt, unsigned int len){
+void mesh_command_handle(unsigned char *dt, unsigned int len){
     unsigned char mesh_cmd_type = dt[0];
     unsigned int mesh_cmd_len = len - MESH_CMD_TYPE_LEN;
     unsigned char *mesh_cmd_data = dt + MESH_CMD_TYPE_LEN;

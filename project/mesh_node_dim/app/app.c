@@ -331,21 +331,6 @@ void test_simu_io_user_define_proc()
 }
 #endif
 
-typedef struct SubAdr{
-	u16* subAdr;
-	int num;
-}SubAdr;
-
-SubAdr sub;
-
-int update_subAdr(){
-	sub.subAdr = model_sig_g_onoff_level.onoff_srv[0].com.sub_list;
-	sub.num = sizeof(model_sig_g_onoff_level.onoff_srv[0].com.sub_list)/sizeof(model_sig_g_onoff_level.onoff_srv[0].com.sub_list[0]);
-	if(sub.num == 0){
-		return 0;
-	} 
-	return 1;
-}
 
 
 
@@ -372,24 +357,17 @@ void dim_set_lum_to_SentAddr(dim *d){
 		if(d->SentAddr.subAdr[i] == ADR_ALL_NODES){
 			break;
 		}
-		set_lum_cmd(d->SentAddr.subAdr[i], d->lum);
+		mesh_set_lum_cmd(d->SentAddr.subAdr[i], d->lum);
 	}
 	return;
 }
 
 void dim_update_SentAddr(dim *d){
-	update_subAdr();
-	d->SentAddr = sub;
+	d->SentAddr = mesh_get_sub_addr();
 }
 
 void dim_update_lum(dim *d, int lum){
 	d->lum = lum;
-	return;
-}
-
-void dim_sent_ctrl_cmd(dim *d){
-	dim_convert_adc_val(d);
-	dim_set_lum_to_SentAddr(d);
 	return;
 }
 
@@ -398,6 +376,11 @@ void dim_convert_adc_val(dim *d){
 	return;
 }
 
+void dim_sent_ctrl_cmd(dim *d){
+	dim_convert_adc_val(d);
+	dim_set_lum_to_SentAddr(d);
+	return;
+}
 
 void dim_ctrl_process(dim *d, int adc_in){
 

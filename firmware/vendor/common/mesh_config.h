@@ -459,16 +459,29 @@ extern "C" {
     #else
 #define MD_POWER_ONOFF_EN           MD_DEF_TRANSIT_TIME_EN 	// because both of them save in same flash sector.
     #endif
-#define MD_TIME_EN                  1
-#define MD_SCENE_EN                 1
-#define MD_SCHEDULE_EN              MD_TIME_EN  // because both of them save in same flash sector.
-#define MD_PROPERTY_EN				0
-#define	MD_LOCATION_EN				0	// location,sensor,battery use same flash addr, but one sector max store 6 models
-#define MD_SENSOR_EN				1	
-#define MD_BATTERY_EN				0
+#if (__PROJECT_NODE_DIM__)
+    #define MD_TIME_EN                  0
+    #define MD_SCENE_EN                 0
+    #define MD_SCHEDULE_EN              MD_TIME_EN  // because both of them save in same flash sector.
+    #define MD_PROPERTY_EN				0
+    #define	MD_LOCATION_EN				0	// location,sensor,battery use same flash addr, but one sector max store 6 models
+    #define MD_SENSOR_EN				0	
+    #define MD_BATTERY_EN				0
 
-#define MD_SERVER_EN                1   // SIG and vendor MD
-#define MD_CLIENT_EN                0   // just SIG MD
+    #define MD_SERVER_EN                1   // SIG and vendor MD
+    #define MD_CLIENT_EN                1   // just SIG MD
+#else  
+    #define MD_TIME_EN                  1
+    #define MD_SCENE_EN                 1
+    #define MD_SCHEDULE_EN              MD_TIME_EN  // because both of them save in same flash sector.
+    #define MD_PROPERTY_EN				0
+    #define	MD_LOCATION_EN				0	// location,sensor,battery use same flash addr, but one sector max store 6 models
+    #define MD_SENSOR_EN				1	
+    #define MD_BATTERY_EN				0
+
+    #define MD_SERVER_EN                1   // SIG and vendor MD
+    #define MD_CLIENT_EN                0   // just SIG MD
+#endif
     #if(DUAL_VENDOR_EN)
 #define MD_CLIENT_VENDOR_EN         0
     #elif ((LIGHT_TYPE_SEL == LIGHT_TYPE_PANEL) || SPIRIT_VENDOR_EN)

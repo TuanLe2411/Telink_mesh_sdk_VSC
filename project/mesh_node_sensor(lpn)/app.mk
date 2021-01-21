@@ -5,6 +5,9 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 
 OBJS += \
+$(OUT_PATH)/app_mesh_com.o \
+$(OUT_PATH)/app_routes.o \
+$(OUT_PATH)/app_serial.o \
 $(OUT_PATH)/app.o \
 $(OUT_PATH)/app_att.o \
 $(OUT_PATH)/main.o

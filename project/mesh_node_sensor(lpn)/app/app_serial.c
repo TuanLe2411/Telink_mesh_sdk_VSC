@@ -16,22 +16,7 @@ int uart_print_data(u8 *para, int n, u8 *head, u8 head_len){
 	if(n > (fifoSize - 2 - 1)){ // 2: size of length,  1: size of type
         return -1;
     }
-	u8 head[1] = {HCI_RSP_USER};
 	return my_fifo_push_hci_tx_fifo(para, n, head, head_len);
-}
-
-void rx_from_uart_cb(){
-	uart_ErrorCLR();
-	
-	uart_data_t* p = (uart_data_t *)my_fifo_get(&hci_rx_fifo);
-	if(p){
-		u32 rx_len = p->len & 0xff; //usually <= 255 so 1 byte should be sufficient
-		if (rx_len)
-		{
-			serial_data_handle(p->data, p->len);
-		}
-	}
-	return;
 }
 
 void serial_data_handle(unsigned char *dt, u16 len){
@@ -49,7 +34,22 @@ void serial_data_handle(unsigned char *dt, u16 len){
         default:
             break;
     }
-
     return;
 }
+
+void rx_from_uart_cb(){
+	uart_ErrorCLR();
+	
+	uart_data_t* p = (uart_data_t *)my_fifo_get(&hci_rx_fifo);
+	if(p){
+		u32 rx_len = p->len & 0xff; //usually <= 255 so 1 byte should be sufficient
+		if (rx_len)
+		{
+			serial_data_handle(p->data, p->len);
+		}
+	}
+	return;
+}
+
+
 
