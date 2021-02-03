@@ -25,11 +25,6 @@
 #include "vendor/common/app_proxy.h"
 #include "proj_lib/ble/l2cap.h"
 #include "proj_lib/ble/ble_common.h"
-#include "vendor/common/mesh_common.h"
-
-#include "app_serial.h"
-#include "app_routes.h"
-#include "app_mesh_com.h"
 
 #if MI_API_ENABLE
 #include "mesh/mi_api/telink_sdk_mible_api.h"
@@ -332,41 +327,6 @@ void test_simu_io_user_define_proc()
     }
 }
 #endif
-// u8 mesh_get_hci_tx_fifo_cnt()
-// {
-// #if (HCI_ACCESS == HCI_USE_USB)
-// 	return hci_tx_fifo.size;
-// #elif (HCI_ACCESS == HCI_USE_UART)
-
-// 	return hci_tx_fifo.size;
-// #else
-// 	return 0;
-// #endif
-// }
-
-// int test(u8 *para, int n){
-// 	u8 fifoSize = mesh_get_hci_tx_fifo_cnt();
-// 	if(n > (fifoSize - 2 - 1)){ // 2: size of length,  1: size of type
-//         return -1;
-//     }
-    
-// 	u8 head[1] = {HCI_RSP_USER};
-// 	return my_fifo_push_hci_tx_fifo(para, n, 0, 0);
-// }
-
-// void testHciUart(){
-// 	test("hello", 5);
-// 	test("\n", 1);
-// 	//gateway_common_cmd_rsp(0x01, "hello", 6);
-// 	WaitMs(200);
-// }
-
-
-void function_init(){
-	serial_init(&Uart, "uart");
-	mesh_command_handle_init(&MeshHandle, "mesh_cmd");
-	sensor_copy_init(&Light_sensor, "lightSensor");
-};
 
 void main_loop(){
     static u32 tick_loop;
@@ -407,6 +367,8 @@ void main_loop(){
 	static u32 adc_check_time;
     if(clock_time_exceed(adc_check_time, 1000*1000)){
         adc_check_time = clock_time();
+        static u16 T_adc_val;
+        T_adc_val = adc_BatteryValueGet();
     }  
 	#endif
 
@@ -416,7 +378,6 @@ void main_loop(){
 	#if MI_SWITCH_LPN_EN
 	mi_mesh_lowpower_loop();
 	#endif
-	//testHciUart();
 }
 
 #if IRQ_TIMER1_ENABLE
@@ -543,8 +504,8 @@ void user_init()
 		blc_register_hci_handler (app_hci_cmd_from_usb, blc_hci_tx_to_usb);
 		#elif (HCI_ACCESS == HCI_USE_UART)	//uart
 		uart_drv_init();
-		//blc_register_hci_handler (blc_rx_from_uart, blc_hci_tx_to_uart);		//default handler
-		blc_register_hci_handler(rx_from_uart_cb, blc_hci_tx_to_uart);				//customized uart handler
+		blc_register_hci_handler (blc_rx_from_uart, blc_hci_tx_to_uart);		//default handler
+		//blc_register_hci_handler(rx_from_uart_cb,tx_to_uart_cb);				//customized uart handler
 		#endif
 	#endif
 	#if ADC_ENABLE
@@ -624,7 +585,6 @@ void user_init()
 		blt_soft_timer_init();
 		//blt_soft_timer_add(&soft_timer_test0, 200*1000);
 	#endif
-	function_init();
 }
 
 #if (PM_DEEPSLEEP_RETENTION_ENABLE)

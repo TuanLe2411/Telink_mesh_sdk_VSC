@@ -34,14 +34,12 @@
 #include "proj_lib/ble/ble_smp.h"
 #include "proj_lib/mesh_crypto/mesh_crypto.h"
 #include "proj_lib/mesh_crypto/mesh_md5.h"
-
 #include "proj_lib/sig_mesh/app_mesh.h"
 #include "vendor/common/app_provison.h"
 #include "vendor/common/app_beacon.h"
 #include "vendor/common/app_proxy.h"
 #include "vendor/common/app_health.h"
 #include "proj/drivers/keyboard.h"
-#include "app.h"
 #include "proj_lib/ble/gap.h"
 #include "vendor/common/blt_soft_timer.h"
 #include "proj/drivers/rf_pa.h"
@@ -265,7 +263,7 @@ typedef struct sensor{
 }sensor;
 
 sensor lightSensor;
-void init_sensor(sensor *s, char type){
+void sensor_init(sensor *s, char type){
 	s->Cond = DEFAULT_CONDITION;
 	s->Span = DEFAULT_SPAN;
 	s->sensor_type = type;
@@ -300,6 +298,7 @@ void sensor_set_onoff_to_SentAdr(sensor *s, char onoff){
 
 void sensor_update_SentAddr(sensor *s){
 	s->SentAddr = mesh_get_sub_addr();
+	return;
 }
 
 void sensor_update_sensor_data(sensor *s){
@@ -307,8 +306,12 @@ void sensor_update_sensor_data(sensor *s){
 	return;
 }
 
+void sensor_send_data(sensor *s){
+	return;
+}
+
 #if SENSOR_CONDITION
-	void update_sensor_cond(sensor *s){
+	void sensor_update_cond(sensor *s){
 		u16 temp = model_sig_sensor.sensor_states[0].setting[0].setting_raw
 		u8 loc_cond = temp && 0x00ff;
 		u8 loc_span = temp >> 8;
@@ -324,24 +327,42 @@ void sensor_update_sensor_data(sensor *s){
 	}
 #endif
 
-void light_ctrl_process(sensor *s, int adc_data){
+void sensor_light_ctrl_process(sensor *s, int adc_data){
 	sensor_update_SentAddr(s);
-	#if SENSOR_CONDITION
-		update_sensor_cond(s);
-	#endif
-		s->C_adc_value = adc_data;
-		if(s->L_adc_value != s->C_adc_value){
-			s->L_adc_value = s->C_adc_value;
-			sensor_update_sensor_data(s);
-			if(s->sensor_dt >= s->Cond){
-				sensor_set_onoff_to_SentAdr(s, 0);
-			}else{
-				sensor_set_onoff_to_SentAdr(s, 1);
-				sensor_set_lum_to_SentAdr(s, 100 - (char)((s->sensor_dt)/5));
-			}
+	s->C_adc_value = adc_data;
+	if(s->L_adc_value != s->C_adc_value){
+		s->L_adc_value = s->C_adc_value;
+		sensor_update_sensor_data(s);
+		sensor_send_data(s);
+		if(s->sensor_dt >= s->Cond){
+			sensor_set_onoff_to_SentAdr(s, 0);
+		}else{
+			sensor_set_onoff_to_SentAdr(s, 1);
+			sensor_set_lum_to_SentAdr(s, 100 - (char)((s->sensor_dt)/5));
 		}
+	}
 	
 	return;
+}
+
+void sensor_ctrl_proc(sensor *s, int adc_data){
+	static u32 sensor_check_time, sensor_update_time;
+
+	#if ADC_ENABLE
+    if(clock_time_exceed(sensor_check_time, lightSensor.Span*1000*1000)){
+        sensor_check_time = clock_time();
+		static u16 T_adc_val;
+		T_adc_val = adc_sample_and_get_result();
+		sensor_light_ctrl_process(&lightSensor, T_adc_val);
+    }
+	#endif
+
+	if(clock_time_exceed(sensor_update_time, 10*1000*1000)){
+        sensor_update_time = clock_time();
+		#if SENSOR_CONDITION
+			sensor_update_cond(s);
+		#endif
+    }    
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -380,7 +401,7 @@ void main_loop ()
         sensor_check_time = clock_time();
 		static u16 T_adc_val;
 		T_adc_val = adc_sample_and_get_result();
-		light_ctrl_process(&lightSensor, T_adc_val);
+		sensor_light_ctrl_process(&lightSensor, T_adc_val);
     }  
 #endif	
 	#if PTS_TEST_EN
@@ -499,7 +520,7 @@ void user_init()
 	//blt_soft_timer_add(&soft_timer_test0, 1*1000*1000);
 #endif
 
-	init_sensor(&lightSensor, LIGHT_SENSOR_TYPE);
+	sensor_init(&lightSensor, LIGHT_SENSOR_TYPE);
 }
 
 #if (PM_DEEPSLEEP_RETENTION_ENABLE)

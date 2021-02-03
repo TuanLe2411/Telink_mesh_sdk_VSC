@@ -7,8 +7,9 @@ typedef struct SubAdr{
 	int num;
 }SubAdr;
 
-extern void mesh_send_onoff_cmd(unsigned short int addr, char onoff);
-extern void mesh_set_lum_cmd(unsigned short int addr, int lum);
+extern void mesh_send_onoff_cmd(u16 addr, char onoff);
+extern void mesh_set_lum_cmd(u16 addr, int lum);
+extern void mesh_send_sensor_data();
 extern SubAdr mesh_get_sub_addr();
 
 #endif

@@ -77,7 +77,7 @@ extern "C" {
 #define HCI_USE_UART	1
 #define HCI_USE_USB		2
 
-#define HCI_ACCESS		HCI_USE_UART 
+#define HCI_ACCESS		HCI_USE_NONE 
 
 #if (HCI_ACCESS == HCI_USE_UART)
 #define UART_TX_PIN		UART_TX_PD7
@@ -94,14 +94,14 @@ extern "C" {
 #define PRINT_DEBUG_INFO                    1
 #endif
 
-#define ADC_ENABLE		1
+#define ADC_ENABLE		0
 #if ADC_ENABLE
 #define ADC_BASE_MODE	1	//GPIO voltage
 #define ADC_VBAT_MODE	2	//Battery Voltage
 
-#define ADC_MODE		ADC_BASE_MODE
-#define ADC_CHNM_ANA_INPUT 		GPIO_PC4 // one of ADC_GPIO_tab[]
-#define ADC_PRESCALER	ADC_PRESCALER_1F4
+#define ADC_MODE		ADC_VBAT_MODE
+#define ADC_CHNM_ANA_INPUT 		GPIO_PB3 // one of ADC_GPIO_tab[]
+#define ADC_PRESCALER	ADC_PRESCALER_1F8
 #endif
 
 #define ONLINE_STATUS_EN        0
@@ -210,10 +210,10 @@ extern "C" {
 
 //---------------  LED / PWM
 
-#define PWM_R       GPIO_PB6		//red
-#define PWM_G       GPIO_PB6		//green
-#define PWM_B       GPIO_PB6		//blue
-#define PWM_W       GPIO_PB6		//white
+#define PWM_R       GPIO_PC4		//red
+#define PWM_G       GPIO_PC3		//green
+#define PWM_B       GPIO_PC2		//blue
+#define PWM_W       GPIO_PB4		//white
 
 #define PWM_FUNC_R  AS_PWM  // AS_PWM_SECOND
 #define PWM_FUNC_G  AS_PWM  // AS_PWM_SECOND

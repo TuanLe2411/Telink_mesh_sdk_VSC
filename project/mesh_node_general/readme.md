@@ -1,1 +1,2 @@
-Project mesh_node_general just is a reference project helping create others. Do not use it in your project!
+mesh_node_general is a full-functional project. User can using software architecture
+of this project to create othersothers

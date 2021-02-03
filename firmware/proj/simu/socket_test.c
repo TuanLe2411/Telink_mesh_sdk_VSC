@@ -24,7 +24,7 @@
 
 #ifdef WIN32
 
-#if 0
+#if 1
 
 #include "../os/ev.h"
 

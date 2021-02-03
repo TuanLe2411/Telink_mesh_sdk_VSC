@@ -1,15 +1,9 @@
 #ifndef __APP_SERIAL_H__
 #define __APP_SERIAL_H__
+#include "proj/common/types.h"
 
-typedef struct serial{
-    char *name;
-}serial;
-
-extern serial Uart;
-
+///////////uart//////////////////
 extern void rx_from_uart_cb();
-extern void serial_init(serial *s, char *name);
-extern void serial_sent_data(serial *s, char *data, unsigned int len);
-extern void serial_data_recv(serial *s);
+extern int uart_print_data(u8 *para, int n, u8 *head, u8 head_len);
 
 #endif

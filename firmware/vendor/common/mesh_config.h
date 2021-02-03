@@ -459,7 +459,7 @@ extern "C" {
     #else
 #define MD_POWER_ONOFF_EN           MD_DEF_TRANSIT_TIME_EN 	// because both of them save in same flash sector.
     #endif
-#if (__PROJECT_NODE_DIM__)
+#if (__PROJECT_NODE_DIM__ || __PROJECT_NODE_BRIDGE__)
     #define MD_TIME_EN                  0
     #define MD_SCENE_EN                 0
     #define MD_SCHEDULE_EN              MD_TIME_EN  // because both of them save in same flash sector.
@@ -584,6 +584,12 @@ extern "C" {
 #define FEATURE_PROV_EN 		1
 #define FEATURE_RELAY_EN		0
 #define FEATURE_PROXY_EN 		0
+#elif(__PROJECT_MESH__ && __PROJECT_NODE_BRIDGE__ &&(!WIN32))
+#define FEATURE_FRIEND_EN 		0
+#define FEATURE_LOWPOWER_EN		0
+#define FEATURE_PROV_EN 		0
+#define FEATURE_RELAY_EN		0
+#define FEATURE_PROXY_EN 		1
 #else
 #define FEATURE_FRIEND_EN 		1   // WIN 32 should be suport disable: model_sig_cfg_s.frid
 #define FEATURE_LOWPOWER_EN		0

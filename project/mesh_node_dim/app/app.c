@@ -26,8 +26,7 @@
 #include "proj_lib/ble/l2cap.h"
 #include "proj_lib/ble/ble_common.h"
 
-#include "app_mesh_com.h"
-#include "app_serial.h"
+#include "interface.h"
 
 #if MI_API_ENABLE
 #include "mesh/mi_api/telink_sdk_mible_api.h"
@@ -331,69 +330,6 @@ void test_simu_io_user_define_proc()
 }
 #endif
 
-
-
-
-typedef struct dim{
-	u16 L_adc_value;
-	u16 C_adc_value; 
-	int lum;
-	int delay;  //us
-	SubAdr SentAddr;
-}dim;
-
-dim Dim;
-
-void dim_init(dim *d){
-	d->delay = DEFAULT_DELAY;
-	d->C_adc_value = 0;
-	d->L_adc_value = 0;
-	return;
-}
-
-void dim_set_lum_to_SentAddr(dim *d){
-
-	for(int i = 0; i< d->SentAddr.num; i++){
-		if(d->SentAddr.subAdr[i] == ADR_ALL_NODES){
-			break;
-		}
-		mesh_set_lum_cmd(d->SentAddr.subAdr[i], d->lum);
-	}
-	return;
-}
-
-void dim_update_SentAddr(dim *d){
-	d->SentAddr = mesh_get_sub_addr();
-}
-
-void dim_update_lum(dim *d, int lum){
-	d->lum = lum;
-	return;
-}
-
-void dim_convert_adc_val(dim *d){
-	d->lum = (char)((d->C_adc_value)/32);
-	return;
-}
-
-void dim_sent_ctrl_cmd(dim *d){
-	dim_convert_adc_val(d);
-	dim_set_lum_to_SentAddr(d);
-	return;
-}
-
-void dim_ctrl_process(dim *d, int adc_in){
-
-	dim_update_SentAddr(d);
-	d->C_adc_value = adc_in;
-	if(d->L_adc_value != d->C_adc_value){
-		d->L_adc_value = d->C_adc_value;
-		dim_convert_adc_val(d);
-		dim_sent_ctrl_cmd(d);
-	}
-}
-
-
 void main_loop(){
     static u32 tick_loop;
 	tick_loop ++;
@@ -429,25 +365,13 @@ void main_loop(){
 		mi_schd_process();
 	#endif 
 
-	#if ADC_ENABLE
-	static u32 adc_check_time;
-    if(clock_time_exceed(adc_check_time, 200*1000)){
-        adc_check_time = clock_time();
-        static u16 T_adc_val;
-        T_adc_val = adc_sample_and_get_result();  
-		dim_ctrl_process(&Dim, T_adc_val);
-	
-	}
-	
-	#endif
 	#if DEBUG_IV_UPDATE_TEST_EN
 	iv_index_test_button_firmware();
 	#endif
 	#if MI_SWITCH_LPN_EN
 	mi_mesh_lowpower_loop();
 	#endif
-    //uart_test();
-	//set_lum_to_SubAdr(30);
+    user_func_proc();
 }
 
 #if IRQ_TIMER1_ENABLE
@@ -658,7 +582,7 @@ void user_init()
 		//blt_soft_timer_add(&soft_timer_test0, 200*1000);
 	#endif
 
-	dim_init(&Dim);
+	user_func_init();
 }
 
 #if (PM_DEEPSLEEP_RETENTION_ENABLE)

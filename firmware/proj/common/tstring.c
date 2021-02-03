@@ -139,6 +139,45 @@ int strcmp(const char* firstString, const char* secondString) {
 	return 1;
 }
 
+int strncmp (const char *s1, const char *s2, long unsigned int n)
+{
+	unsigned char c1 = '\0';
+	unsigned char c2 = '\0';
+	if (n >= 4)
+		{
+			long unsigned int n4 = n >> 2;
+			do
+				{
+				c1 = (unsigned char) *s1++;
+				c2 = (unsigned char) *s2++;
+				if (c1 == '\0' || c1 != c2)
+					return c1 - c2;
+				c1 = (unsigned char) *s1++;
+				c2 = (unsigned char) *s2++;
+				if (c1 == '\0' || c1 != c2)
+					return c1 - c2;
+				c1 = (unsigned char) *s1++;
+				c2 = (unsigned char) *s2++;
+				if (c1 == '\0' || c1 != c2)
+					return c1 - c2;
+				c1 = (unsigned char) *s1++;
+				c2 = (unsigned char) *s2++;
+				if (c1 == '\0' || c1 != c2)
+					return c1 - c2;
+				} while (--n4 > 0);
+			n &= 3;
+		}
+	while (n > 0)
+		{
+			c1 = (unsigned char) *s1++;
+			c2 = (unsigned char) *s2++;
+			if (c1 == '\0' || c1 != c2)
+				return c1 - c2;
+			n--;
+		}
+	return c1 - c2;
+}
+
 char * strncpy(char *s, const char *t, unsigned int n) {
 	char *p = s;
 	unsigned int i = 0;
@@ -164,7 +203,7 @@ char *	strstr(const char *s1, const char *s2)
  if (*s2){
   while(*s1){
     for (n=0;*(s1+n)==*(s2+n);n++){
-	    if (!*(s2+n+1)){            //²éÕÒµÄÏÂÒ»¸ö×Ö·ûÊÇ·ñÎª'\0'
+	    if (!*(s2+n+1)){            //ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ç·ï¿½Îª'\0'
 	     return (char*)s1;
 	    }
     }

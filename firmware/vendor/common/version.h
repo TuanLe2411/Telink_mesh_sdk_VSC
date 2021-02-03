@@ -40,10 +40,14 @@
 #define PID_GATEWAY             (0x0101)
 // ------ LPN ------
 #define PID_LPN                 (0x0201)
+#define PID_SENSOR              (0x0202)
 // ------ SWITCH ------
 #define PID_SWITCH              (0x0301)
+#define PID_DIM                 (0x0302)
 // ------ SPIRIT_LPN ------
 #define PID_SPIRIT_LPN          (0x0401)
+//----------BRIDGE---------
+#define POD_BRIDGE              (0x0501)
 
 /*
 MESH_PID_SEL : PID is product ID,
@@ -63,8 +67,8 @@ format: please refer to spec "4.2.1.1 Composition Data Page 0"
     #endif
 #elif (__PROJECT_MESH_LPN__)  // must define in TC32_CC_Assember ->General , too. because cstartup.s can't read predefine value in TC32_compiler-->symbols
     #if ((MCU_CORE_TYPE == MCU_CORE_8258) || (MCU_CORE_TYPE == MCU_CORE_8278))
-        #if (__PROJECT_NODE_ONOFF_SWITCH__)
-            #define MESH_PID_SEL		(PID_SWITCH)
+        #if (__PROJECT_NODE_SENSOR__)
+            #define MESH_PID_SEL		(PID_SENSOR)
             #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
         #else
             #define MESH_PID_SEL		(PID_LPN)
@@ -83,9 +87,15 @@ format: please refer to spec "4.2.1.1 Composition Data Page 0"
 #elif (__PROJECT_8267_MASTER_KMA_DONGLE__)
 #define MESH_PID_SEL		(PID_UNKNOW)
 #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
-#elif (__PROJECT_MESH__)   // light
+#elif (__PROJECT_MESH__)
     #if (__PROJECT_NODE_DIM__)
+        #define MESH_PID_SEL		(PID_DIM)
+        #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
+    #elif (__PROJECT_NODE_SWITCH__)
         #define MESH_PID_SEL		(PID_SWITCH)
+        #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
+    #elif (__PROJECT_NODE_BRIDGE__)
+        #define MESH_PID_SEL		(POD_BRIDGE)
         #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
     #else
         #define MESH_PID_SEL		(LIGHT_TYPE_SEL)

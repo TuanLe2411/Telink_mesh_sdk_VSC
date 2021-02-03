@@ -37,10 +37,14 @@
 			#include "../project/mesh_node_general/app/app_config_8258.h"
 		#elif (__PROJECT_NODE_LIGHT__)
 			#include "../project/mesh_node_light/app/app_config_8258.h"
-		#elif (__PROJECT_NODE_ONOFF_SWITCH__)
-			#include "../project/mesh_node_switch(onoff)/app/app_config_8258.h"
+		#elif (__PROJECT_NODE_SWITCH__)
+			#include "../project/mesh_node_switch/app/app_config_8258.h"
 		#elif (__PROJECT_NODE_DIM__)
 			#include "../project/mesh_node_dim/app/app_config_8258.h"
+		#elif (__PROJECT_NODE_SWITCH_TEST__)
+			#include "../project/mesh_node_switch(test)/app/app_config_8258.h"
+		#elif (__PROJECT_NODE_BRIDGE__)
+			#include "../project/mesh_node_bridge/app/app_config_8258.h"
 		#else
 			#include "../mesh/app_config_8258.h"
 		#endif
@@ -53,6 +57,8 @@
 	#elif(MCU_CORE_TYPE == MCU_CORE_8258)
 		#if (__PROJECT_NODE_SENSOR__)
 			#include "../project/mesh_node_sensor(lpn)/app/app_config_8258.h"
+		#elif (__PROJECT_NODE_ONOFF_SWITCH__)
+			#include "../project/mesh_node_switch(lpn)/app/app_config_8258.h"
 		#else
 			#include "../mesh_lpn/app_config_8258.h"
 		#endif
@@ -63,11 +69,7 @@
 	#if(MCU_CORE_TYPE == MCU_CORE_8269)
 	#include "../mesh_switch/app_config_8269.h"
 	#elif(MCU_CORE_TYPE == MCU_CORE_8258)
-		#if (__PROJECT_NODE_ONOFF_SWITCH__)
-			#include "../project/mesh_node_switch(onoff)/app/app_config_8258.h"
-		#else
 			#include "../mesh_switch/app_config_8258.h"
-	#endif
 	#elif(MCU_CORE_TYPE == MCU_CORE_8278)
 	#include "../mesh_switch/app_config_8278.h"
 	#endif

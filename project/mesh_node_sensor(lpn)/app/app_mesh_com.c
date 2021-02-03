@@ -2,6 +2,7 @@
 #include "vendor/common/mesh_node.h"
 #include "proj_lib/sig_mesh/app_mesh.h"
 #include "vendor/common/cmd_interface.h"
+#include "proj/common/types.h"
 
 SubAdr sub;
 
@@ -15,19 +16,24 @@ int get_subAdr(){
 }
 
 
-void mesh_send_onoff_cmd(unsigned short int addr, char onoff){
+void mesh_send_onoff_cmd(u16 addr, char onoff){
 	access_cmd_onoff(addr, 0, onoff, CMD_NO_ACK, 0);
 	return;
 };
 
-void mesh_set_lum_cmd(unsigned short int addr, int lum){
+void mesh_set_lum_cmd(u16 addr, int lum){
 	access_set_lum(addr, 0, lum, CMD_NO_ACK);
 	return;
 };
 
+void mesh_send_sensor_data(){};
+
 SubAdr mesh_get_sub_addr(){
-	get_subAdr();
-	SubAdr temp = sub;
+	SubAdr temp;
+	int ok = get_subAdr();
+	if(ok){
+		temp = sub;
+	}
 	return temp;
 }
 

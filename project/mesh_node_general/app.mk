@@ -8,6 +8,8 @@ OBJS += \
 $(OUT_PATH)/app_mesh_com.o \
 $(OUT_PATH)/app_routes.o \
 $(OUT_PATH)/app_serial.o \
+$(OUT_PATH)/app_device.o \
+$(OUT_PATH)/interface.o \
 $(OUT_PATH)/app.o \
 $(OUT_PATH)/app_att.o \
 $(OUT_PATH)/main.o
