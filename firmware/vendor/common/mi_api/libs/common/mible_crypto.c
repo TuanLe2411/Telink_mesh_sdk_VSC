@@ -1,8 +1,8 @@
 //#include <string.h>
 
-#include "mible_api.h"
-#include "mible_log.h"
-#include "cryptography/mi_crypto.h"
+#include "../../mible_api.h"
+#include "../../mijia_ble_api/mible_log.h"
+#include "../cryptography/mi_crypto.h"
 #include "mible_crypto.h"
 #if MI_API_ENABLE
 #if !defined(SESSION_EXPIRE_SEC)

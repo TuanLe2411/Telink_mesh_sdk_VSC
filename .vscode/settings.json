@@ -37,7 +37,20 @@
         "config.h": "c",
         "printf.h": "c",
         "cstring": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "mi_config.h": "c",
+        "mible_api.h": "c",
+        "mible_type.h": "c",
+        "mible_beacon.h": "c",
+        "mi_service_server.h": "c",
+        "mible_port.h": "c",
+        "queue.h": "c",
+        "mi_crypto.h": "c",
+        "mible_log.h": "c",
+        "mi_crypto_backend_msc.h": "c",
+        "mible_trace.h": "c",
+        "mible_rxfer.h": "c",
+        "pt.h": "c"
     },
     "cmake.configureOnOpen": false
 }

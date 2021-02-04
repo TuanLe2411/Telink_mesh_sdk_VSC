@@ -95,15 +95,15 @@ OBJS += $(OUT_PATH)/vendor/common/mi_api/libs/mi_config.o
 
 ################################################################################
 
-# OUT_DIR += /vendor/common/mi_api/libs/common
+OUT_DIR += /vendor/common/mi_api/libs/common
 
-# OBJS += \
-# $(OUT_PATH)/vendor/common/mi_api/libs/common/crc32.o \
-# $(OUT_PATH)/vendor/common/mi_api/libs/common/mible_beacon.o \
-# $(OUT_PATH)/vendor/common/mi_api/libs/common/mible_crypto.o \
-# $(OUT_PATH)/vendor/common/mi_api/libs/common/mible_rxfer.o \
-# $(OUT_PATH)/vendor/common/mi_api/libs/common/queue.o \
-# $(OUT_PATH)/vendor/common/mi_api/libs/common/tlv.o 
+OBJS += \
+$(OUT_PATH)/vendor/common/mi_api/libs/common/crc32.o \
+$(OUT_PATH)/vendor/common/mi_api/libs/common/mible_beacon.o \
+$(OUT_PATH)/vendor/common/mi_api/libs/common/mible_crypto.o \
+$(OUT_PATH)/vendor/common/mi_api/libs/common/mible_rxfer.o \
+$(OUT_PATH)/vendor/common/mi_api/libs/common/queue.o \
+$(OUT_PATH)/vendor/common/mi_api/libs/common/tlv.o 
 
 ################################################################################
 
@@ -126,8 +126,8 @@ $(OUT_PATH)/vendor/common/mi_api/libs/%.o: $(TEL_PATH)/firmware/vendor/common/mi
 ################################################################################
 # Automatically-generated file. Do not edit!
 ################################################################################
-# OUT_DIR += /vendor/common/mi_api/mi_vendor
-# OBJS += $(OUT_PATH)/vendor/common/mi_api/mi_vendor/vendor_model_mi.o
+OUT_DIR += /vendor/common/mi_api/mi_vendor
+OBJS += $(OUT_PATH)/vendor/common/mi_api/mi_vendor/vendor_model_mi.o
 
 # Each subdirectory must supply rules for building sources it contributes
 $(OUT_PATH)/vendor/common/mi_api/mi_vendor/%.o: $(TEL_PATH)/firmware/vendor/common/mi_api/mi_vendor/%.c

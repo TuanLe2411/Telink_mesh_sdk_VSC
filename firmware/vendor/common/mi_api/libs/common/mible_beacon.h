@@ -1,8 +1,8 @@
 #ifndef MIBLE_BEACON_H__
 #define MIBLE_BEACON_H__
 
-#include "mible_type.h"
-#include "mible_port.h"
+#include "../../mijia_ble_api/mible_type.h"
+#include "../../mijia_ble_api/mible_port.h"
 
 typedef enum {
     MI_EVT_BASE          = 0x0000,

@@ -78,20 +78,6 @@ $(OUT_PATH)/proj/mcu/%.o: $(TEL_PATH)/firmware/proj/mcu/%.c
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-# OUT_DIR += /proj/print
-
-# OBJS += $(OUT_PATH)/proj/print/u_printf.o
-
-
-# # Each subdirectory must supply rules for building sources it contributes
-# $(OUT_PATH)/proj/print/%.o: $(TEL_PATH)/firmware/proj/print/%.c
-# 	@echo 'Building file: $<'
-# 	@tc32-elf-gcc $(GCC_FLAGS) $(INCLUDE_PATHS) -c -o"$@" "$<"
-
-################################################################################
-# Automatically-generated file. Do not edit!
-################################################################################
-
 OUT_DIR += /proj/mcu_spec
 
 OBJS += \

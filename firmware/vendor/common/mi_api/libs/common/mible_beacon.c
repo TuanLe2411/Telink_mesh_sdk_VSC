@@ -1,16 +1,16 @@
 //#include <string.h>
-#include "mi_config.h"
-#include "mible_type.h"
-#include "mible_api.h"
+#include "../mi_config.h"
+#include "../../mijia_ble_api/mible_type.h"
+#include "../../mible_api.h"
 #include "mible_beacon.h"
 #include "mible_beacon_internal.h"
-#include "common/queue.h"
-#include "mijia_profiles/mi_service_server.h"
-#include "cryptography/mi_crypto.h"
+#include "queue.h"
+#include "../mijia_profiles/mi_service_server.h"
+#include "../cryptography/mi_crypto.h"
 
 #undef  MI_LOG_MODULE_NAME
 #define MI_LOG_MODULE_NAME "MIBEACON"
-#include "mible_log.h"
+#include "../../mijia_ble_api/mible_log.h"
 
 #define MIBLE_MAX_ADV_LENGTH                        31
 #if MI_API_ENABLE

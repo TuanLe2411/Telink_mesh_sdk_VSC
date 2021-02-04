@@ -2,13 +2,13 @@
 #include <stdarg.h>
 //#include <string.h>
 
-#include "mible_api.h"
-#include "mible_trace.h"
-#include "mible_port.h"
-#include "mi_config.h"
+#include "../../mible_api.h"
+#include "../../mijia_ble_api/mible_trace.h"
+#include "../../mijia_ble_api/mible_port.h"
+#include "../mi_config.h"
 #undef  MI_LOG_MODULE_NAME
 #define MI_LOG_MODULE_NAME "RXFER"
-#include "mible_log.h"
+#include "../../mijia_ble_api/mible_log.h"
 
 #include "mible_rxfer.h"
 #if MI_API_ENABLE

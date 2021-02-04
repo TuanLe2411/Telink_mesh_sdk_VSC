@@ -1,4 +1,4 @@
-#include "common/crc32.h"
+#include "crc32.h"
 
 #if FAST_CRC32
 static const uint32_t crc32_tab[] = {

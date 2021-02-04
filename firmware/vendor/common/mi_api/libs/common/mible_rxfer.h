@@ -1,8 +1,8 @@
 #ifndef __MIBLE_RXFER_H__
 #define __MIBLE_RXFER_H__
 #include <stdint.h>
-#include "third_party/pt/pt.h"
-#include "third_party/pt/pt_misc.h"
+#include "../third_party/pt/pt.h"
+#include "../third_party/pt/pt_misc.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

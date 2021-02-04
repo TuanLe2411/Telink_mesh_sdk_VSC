@@ -1,7 +1,7 @@
 #ifndef __MIBLE_CRYPTO_BACKEND_MSC_H__
 #define __MIBLE_CRYPTO_BACKEND_MSC_H__
 #include <stdint.h>
-#include "mible_type.h"
+#include "../../mijia_ble_api/mible_type.h"
 
 typedef enum {
     // Info

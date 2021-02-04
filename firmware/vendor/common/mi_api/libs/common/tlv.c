@@ -1,5 +1,5 @@
 #include "tlv.h"
-#include "mible_log.h"
+#include "../../mijia_ble_api/mible_log.h"
 
 int tlv8_decode(uint8_t * tlv_buf, int buf_size, uint8_t type, tlv8_t **out)
 {

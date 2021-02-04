@@ -2,7 +2,7 @@
 #define __QUEUE_H_
 
 #include <stdint.h>
-#include "mible_type.h"
+#include "../../mijia_ble_api/mible_type.h"
 
 typedef struct {
     void * buf;

@@ -1,6 +1,6 @@
 #include <string.h>
 #include "queue.h"
-#include "mible_port.h"
+#include "../../mijia_ble_api/mible_port.h"
 
 mible_status_t queue_init(queue_t *q, void *buf, char queue_size, char item_size)
 {

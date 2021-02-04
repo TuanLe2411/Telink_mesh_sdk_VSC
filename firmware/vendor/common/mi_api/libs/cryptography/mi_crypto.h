@@ -2,8 +2,8 @@
 #define __MI_CRYPTO_H__
 #include <stdint.h>
 
-#include "cryptography/mi_crypto_backend_msc.h"
-#include "cryptography/mi_crypto_backend_mbedtls.h"
+#include "mi_crypto_backend_msc.h"
+#include "mi_crypto_backend_mbedtls.h"
 
 typedef enum {
     P256R1,
