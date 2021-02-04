@@ -123,9 +123,6 @@ erase_all:
 erase_key:
 	python $(TEL_PATH)/make/Telink_Tools.py -p $(DOWNLOAD_PORT) erase_flash 0x30000 16
 
-monitor:
-	python $(TEL_PATH)/make/monitor.py --port $(DOWNLOAD_PORT) --baud 115200 $(ELF_FILE)
-
 secondary-outputs: $(BIN_FILE) $(LST_FILE) $(SIZEDUMMY)
 
 .PHONY: all clean dependents flash erase_fw erase_key monitor pre-build erase_all 

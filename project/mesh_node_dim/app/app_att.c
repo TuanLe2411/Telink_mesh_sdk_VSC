@@ -27,7 +27,6 @@
 #include "vendor/common/app_proxy.h"
 #include "proj_lib/sig_mesh/app_mesh.h"
 #include "vendor/common/app_beacon.h"
-
 #if(1)
 
 typedef struct

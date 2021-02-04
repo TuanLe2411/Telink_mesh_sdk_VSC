@@ -1,26 +1,25 @@
 {
+    "version": "2.0.0",
     "tasks": [
         {
-            "type": "shell",
-            "label": "C/C++: gcc.exe build active file",
-            "command": "C:\\tc32\\bin\\gcc.exe",
-            "args": [
-                "-g",
-                "${file}",
-                "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
+            "label": "Evk",
+            "type": "process",
+            "command": "C:/Users/admin/OneDrive/Máy tính/BDT/Telink BDT.exe",
             "group": {
                 "kind": "build",
                 "isDefault": true
-            }
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Monitor",
+            "type": "process",
+            "command": "C:/Users/admin/Downloads/Telegram Desktop/Terminal.exe",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
         }
-    ],
-    "version": "2.0.0"
+    ]
 }
