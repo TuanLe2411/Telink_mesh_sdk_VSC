@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.inc": "cpp",
+        "ll_whitelist.h": "c"
+    }
+}
