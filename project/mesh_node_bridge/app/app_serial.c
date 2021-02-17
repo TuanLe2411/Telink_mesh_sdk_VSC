@@ -5,7 +5,6 @@
 #include "jsmn/jsmn.h"
 #include "proj/common/tstring.h"
 #include <stdio.h>
-#include <stdlib.h>
 
 #define UART_CMD_LEN         (1)
 #define UART_MESH_CMD       0x01
@@ -42,7 +41,21 @@ void uart_byte_data_handle(u8 *dt, u16 len){
     return;
 }
 
-char byte[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+u8 hex2int(u8 *hex) {
+    u8 val = 0;
+    while (*hex) {
+        // get current character then increment
+        u8 byte = *hex++; 
+        // transform hex character to the 4bit equivalent number, using the ascii table indexes
+        if (byte >= '0' && byte <= '9') byte = byte - '0';
+        else if (byte >= 'a' && byte <='f') byte = byte - 'a' + 10;
+        else if (byte >= 'A' && byte <='F') byte = byte - 'A' + 10;    
+        // shift 4 to make space for new digit, and add the 4 bits of the new digit 
+        val = (val << 4) | (byte & 0xF);
+    }
+    return val;
+}
+
 u8* uart_convert_string_to_byte(u8* dt, u16 len){
     static u8 r[126];
 	u8 a[2];
@@ -50,7 +63,7 @@ u8* uart_convert_string_to_byte(u8* dt, u16 len){
 	while(i < len){
 		a[0] = dt[i];
 		a[1] = dt[i+1];
-		u8 number = (u8)strtol(a, NULL, 16);
+		u8 number = hex2int(a);
 		r[i/2] = number;
 		i = i + 2;  
 	}
