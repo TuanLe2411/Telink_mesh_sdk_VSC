@@ -1,0 +1,11 @@
+byte type:
+    byte 1: Serial type cmd (mesh_cmd:0x01, zigbee_cmd: 0x02,...)
+    byte 2: object (mesh_light: 0x01, mesh_sensor: 0x02,...)
+    byte 3: action (mesh_light_onoff: 0x01, mesh_light_lum: 0x02)
+    the rest: payload (user define) 
+
+json type:
+    object 1: Serial type cmd (mesh_cmd:0x01, zigbee_cmd: 0x02,...)
+    object 2: payload (object + action + payload in Serial)
+
+P/s: serial cmd max lenght is 252 byte with byte type and 126 byte with json type(because cmd in json type is string)

@@ -175,7 +175,7 @@ unsigned char uart_Init(unsigned short uartCLKdiv, unsigned char bwpc,unsigned c
 unsigned char uart_Send(unsigned char* data, unsigned int len){
     extern const u8 UART_TX_LEN_MAX;
     if(len > UART_TX_LEN_MAX){
-        return 1;	// skip valid length data, avoid dead loop
+        return 0;	// skip invalid length data, avoid dead loop
     }
 
 	if(tx_buff && TXDONE){

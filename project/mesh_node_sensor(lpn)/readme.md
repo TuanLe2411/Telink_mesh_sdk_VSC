@@ -1,0 +1,1 @@
+Project mesh_node_sensor is source  code of a light sensor in smart light system

@@ -50,7 +50,14 @@
         "mi_crypto_backend_msc.h": "c",
         "mible_trace.h": "c",
         "mible_rxfer.h": "c",
-        "pt.h": "c"
+        "pt.h": "c",
+        "app_serial.h": "c",
+        "stddef.h": "c",
+        "_ansi.h": "c",
+        "stdbool.h": "c",
+        "cmath": "cpp",
+        "alloca.h": "c",
+        "reent.h": "c"
     },
     "cmake.configureOnOpen": false
 }

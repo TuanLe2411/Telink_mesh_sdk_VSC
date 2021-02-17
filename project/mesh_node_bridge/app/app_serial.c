@@ -5,10 +5,10 @@
 #include "jsmn/jsmn.h"
 #include "proj/common/tstring.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 #define UART_CMD_LEN         (1)
 #define UART_MESH_CMD       0x01
-#define UART_TEST_JSON_CMD  0x30
 
 u8 mesh_get_hci_tx_fifo_cnt()
 {
@@ -23,7 +23,7 @@ int uart_print_data(u8 *para, int n, u8 *head, u8 head_len){
 	return my_fifo_push_hci_tx_fifo(para, n, head, head_len);
 }
 
-void uart_data_handle(u8 *dt, u16 len){
+void uart_byte_data_handle(u8 *dt, u16 len){
     u8 cmd = dt[0];
     u8 *serial_data = dt + UART_CMD_LEN;
     unsigned int serial_data_len = len - UART_CMD_LEN;
@@ -35,8 +35,6 @@ void uart_data_handle(u8 *dt, u16 len){
                 mesh_command_handle(serial_data, serial_data_len);
             }
             break;
-        case UART_TEST_JSON_CMD:
-            break;
         default:
             break;
     }
@@ -44,29 +42,22 @@ void uart_data_handle(u8 *dt, u16 len){
     return;
 }
 
-typedef struct json_data{
-    char *type;
-    u8 *dt;
-}json_data;
+char byte[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+u8* uart_convert_string_to_byte(u8* dt, u16 len){
+    static u8 r[126];
+	u8 a[2];
+	int i = 0;
+	while(i < len){
+		a[0] = dt[i];
+		a[1] = dt[i+1];
+		u8 number = (u8)strtol(a, NULL, 16);
+		r[i/2] = number;
+		i = i + 2;  
+	}
+	return r;
+};
 
 json_data jsonData;
-
-void rx_from_uart_cb(){
-	uart_ErrorCLR();
-	
-	uart_data_t* p = (uart_data_t *)my_fifo_get(&hci_rx_fifo);
-	if(p){
-		u32 rx_len = p->len & 0xff; //usually <= 255 so 1 byte should be sufficient
-		if (rx_len)
-		{
-			//uart_data_handle(p->data, p->len);
-            uart_json_data_handle(p->data, &jsonData);
-		}
-	}
-	return;
-}
-
-
 
 static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
     if (tok->type == JSMN_STRING && (int)strlen(s) == tok->end - tok->start &&
@@ -76,7 +67,7 @@ static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
     return -1;
 }
 
-int uart_json_data_handle(const char *dt, json_data *j){
+int uart_json_data_handle(const char *dt, u16 len){
     uart_print_data((u8 *)dt, strlen(dt), 0, 0);
     int i;
     int r;
@@ -88,34 +79,43 @@ int uart_json_data_handle(const char *dt, json_data *j){
                     sizeof(t) / sizeof(t[0]));
     if (r < 0) {
         //printf("Failed to parse JSON: %d\n", r);
-        return 1;
+        return 0;
     }
 
     /* Assume the top-level element is an object */
     if (r < 1 || t[0].type != JSMN_OBJECT) {
         //printf("Object expected\n");
-        return 1;
+        return 0;
     }
 
     /* Loop over all keys of the root object */
     for (i = 1; i < r; i++) {
         if (jsoneq(dt, &t[i], "type") == 0) {
-            u8 buff[t[i + 1].end - t[i + 1].start];
+            u8* buff;
             memcpy(buff, dt + t[i + 1].start, t[i + 1].end - t[i + 1].start);
-            j->type = (char *)buff;
-            uart_print_data((u8 *)(j->type), t[i + 1].end - t[i + 1].start, 0, 0);
+            uart_print_data((u8 *)buff, t[i + 1].end - t[i + 1].start, 0, 0);
+            u8* temp = uart_convert_string_to_byte((u8 *)buff, t[i + 1].end - t[i + 1].start);
+            for(int j = 0; j< (t[i + 1].end - t[i + 1].start)/2; j++){
+                jsonData.type[j] = temp[j];
+            }
             i++;
         } else if (jsoneq(dt, &t[i], "data") == 0) {
-            u8 buff[t[i + 1].end - t[i + 1].start];
+            u8* buff;
             memcpy(buff, dt + t[i + 1].start, t[i + 1].end - t[i + 1].start);
-            j->dt = (u8 *)buff;
-            uart_print_data((u8 *)(j->dt), t[i + 1].end - t[i + 1].start, 0, 0);
+            uart_print_data((u8 *)buff, t[i + 1].end - t[i + 1].start, 0, 0);
+            u8* temp = uart_convert_string_to_byte((u8 *)buff, t[i + 1].end - t[i + 1].start);
+            for(int j = 0; j< (t[i + 1].end - t[i + 1].start)/2; j++){
+                jsonData.dt[j] = temp[j];
+            }
+            if(jsonData.type[0] == UART_MESH_CMD){
+                mesh_command_handle(jsonData.dt, (t[i + 1].end - t[i + 1].start)/2);
+            }
             i++;
         }else {
         //printf("Unexpected key: %.*s\n", t[i].end - t[i].start, JSON_STRING + t[i].start);
         }
     }
-    return 0;
+    return 1;
 }
 
 #if 1
@@ -187,3 +187,19 @@ int uart_json_test() {
 }
 
 #endif
+
+void rx_from_uart_cb(){
+	uart_ErrorCLR();
+	
+	uart_data_t* p = (uart_data_t *)my_fifo_get(&hci_rx_fifo);
+	if(p){
+		u32 rx_len = p->len & 0xff; //usually <= 255 so 1 byte should be sufficient
+		if (rx_len)
+		{
+			//uart_data_handle(p->data, p->len);
+            uart_json_data_handle(p->data, p->len);
+            my_fifo_pop(&hci_rx_fifo);
+		}
+	}
+	return;
+}
