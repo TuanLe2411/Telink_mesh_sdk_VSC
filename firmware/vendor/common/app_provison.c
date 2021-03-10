@@ -2856,6 +2856,8 @@ void mesh_pro_rc_adv_dispatch(pro_PB_ADV *p_adv){
 		case STATE_PRO_COMPLETE:
 			if(p_adv->transBear.bearAck.header.GPCF == TRANS_START &&
 				p_adv->transStart.data[0]== PRO_COMPLETE){
+					//device uuid using here?
+					//u8 * devUuid = p_adv->transBear.bearOpen.DeviceUuid;
 				// return the test case result 
 				    #if GATEWAY_ENABLE
 					gateway_upload_prov_rsp_cmd((u8 *)p_rcv_str,PRO_COMPLETE);
@@ -2928,8 +2930,6 @@ int mesh_provison_process(u8 ini_role,u8 *p_rcv)
 {	
 	pro_PB_ADV * rcv_pb_buf = (&rcv_pb);
 	pro_PB_ADV * p_adv = (pro_PB_ADV *) p_rcv;
-	//using Device uuid here
-	//u8* Dev_uuid = p_adv->transBear.bearOpen.DeviceUuid;
 	if(p_adv->ad_type == MESH_ADV_TYPE_BEACON ){
 	    pro_PB_ADV rcv_beacon;
 		memcpy((u8*)&rcv_beacon,p_adv,p_adv->length+1+7);
