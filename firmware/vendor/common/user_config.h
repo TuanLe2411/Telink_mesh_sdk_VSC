@@ -59,6 +59,8 @@
 			#include "../project/mesh_node_sensor(lpn)/app/app_config_8258.h"
 		#elif (__PROJECT_NODE_ONOFF_SWITCH__)
 			#include "../project/mesh_node_switch(lpn)/app/app_config_8258.h"
+		#elif (__PROJECT_NODE_TEST)
+			#include "../project/mesh_node_test(lpn)/app/app_config_8258.h"
 		#else
 			#include "../mesh_lpn/app_config_8258.h"
 		#endif

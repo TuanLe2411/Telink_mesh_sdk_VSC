@@ -28,3 +28,5 @@ Building tutorial:
     * USB: Open terminar: make flash
     
     * EVK: Using BDT tool(just available in windows)
+
+  5. P/s: please don't create any project using LPN feature, because they now activate like a normal node. Watting when i can't fix this bug.
