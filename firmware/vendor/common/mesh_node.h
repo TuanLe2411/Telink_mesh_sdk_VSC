@@ -932,6 +932,53 @@ typedef struct{
 #endif
 }model_vd_light_t;
 
+//-----------BTN_SCENE_BEGIN
+typedef struct {
+	u16 header;
+	u8 bid;
+    u8 mid;
+    u16 sceneId; 
+	u16 appId;
+}model_btn_scene_receive_t;
+
+typedef struct {
+	u16 header;
+	u8 bid;
+	u8 mid;
+	u16 sceneId; 
+	u16 appId;
+}model_btn_scene_response_t;
+
+typedef struct {
+	u8 bid;
+	u8 mid;
+}model_btn_scene_remove_t;
+
+typedef struct {
+	u8 appId;
+}model_btn_scene_call_rgb_scene;
+
+typedef struct {
+	u8 writted;
+	u8 bid;
+    u8 mid;
+    u16 sceneId; 
+	u16 appId;
+}model_btn_scene_save_t;
+
+#define MAX_SCENE_SAVE 60
+typedef struct{
+	#if MD_SERVER_EN
+		model_g_light_s_t srv[LIGHT_CNT];	
+		model_btn_scene_save_t btn[LIGHT_CNT][MAX_SCENE_SAVE];		// server
+	#endif
+	#if MD_CLIENT_VENDOR_EN
+		model_client_common_t clnt[1];		        // client
+	#endif
+}model_vendor_btn_scene_t;
+
+//-----------BTN_SCENE_END
+
 typedef struct{
 #if MD_SERVER_EN
 	model_g_light_s_t onoff_srv[LIGHT_CNT];			// server
@@ -1677,6 +1724,8 @@ extern model_mesh_ota_t        	model_mesh_ota;
 // extern model_g_power_level_t    model_sig_g_power_level; // share with model_sig_lightness
 
 extern model_vd_light_t       	model_vd_light;
+extern model_vendor_btn_scene_t 	model_vd_btn_scene;
+
 extern mesh_key_t mesh_key; 
 extern friend_key_t mesh_fri_key_lpn[NET_KEY_MAX][2];
 extern friend_key_t mesh_fri_key_fn[MAX_LPN_NUM][2];

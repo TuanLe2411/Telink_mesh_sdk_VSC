@@ -259,6 +259,8 @@ u16 g_vendor_id = VENDOR_ID;
 #if WIN32
 u32 g_vendor_md_light_vc_s = VENDOR_MD_LIGHT_S;
 u32 g_vendor_md_light_vc_c = VENDOR_MD_LIGHT_C;
+u32 g_vendor_md_btn_scene_vc_s = VENDOR_MD_BTN_SCENE_S;
+u32 g_vendor_md_btn_scene_vc_c = VENDOR_MD_BTN_SCENE_C;
     #if MD_VENDOR_2ND_EN
 u32 g_vendor_md_light_vc_s2 = VENDOR_MD_LIGHT_S2;
     #endif
@@ -1988,10 +1990,13 @@ void APP_reset_vendor_id(u16 vd_id)
 {
     g_vendor_id = vd_id;
     g_vendor_md_light_vc_s = (g_vendor_md_light_vc_s & 0xFFFF0000) | vd_id;
+	g_vendor_md_btn_scene_vc_s = (g_vendor_md_btn_scene_vc_s & 0xFFFF0000) | vd_id;
+
 	#if MD_VENDOR_2ND_EN
     g_vendor_md_light_vc_s2 = (g_vendor_md_light_vc_s2 & 0xFFFF0000) | vd_id;
 	#endif
     g_vendor_md_light_vc_c = (g_vendor_md_light_vc_c & 0xFFFF0000) | vd_id;
+	g_vendor_md_btn_scene_vc_c = (g_vendor_md_btn_scene_vc_c & 0xFFFF0000) | vd_id;
     APP_set_vd_id_mesh_save_map(vd_id);
     APP_set_vd_id_mesh_cmd_vd_func(vd_id);
 }

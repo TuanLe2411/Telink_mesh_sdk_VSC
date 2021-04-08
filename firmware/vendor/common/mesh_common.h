@@ -97,7 +97,7 @@ typedef struct ais_pri_data{
 	union{
 		u8 fmsk;
 		struct{
-			u8 ble_version:2;//00£ºBLE4.0 01£ºBLE4.2 10£ºBLE5.0 11£ºBLE5.0 above
+			u8 ble_version:2;//00ï¿½ï¿½BLE4.0 01ï¿½ï¿½BLE4.2 10ï¿½ï¿½BLE5.0 11ï¿½ï¿½BLE5.0 above
 			u8 ota_support:1;
 			u8 authen_en:1;
 			u8 secret_type:1;// 0:one device type on key, 1:one device one key
@@ -192,6 +192,8 @@ extern u16 g_vendor_id;
 extern u32 g_vendor_md_light_vc_s;
 extern u32 g_vendor_md_light_vc_s2;
 extern u32 g_vendor_md_light_vc_c;
+extern u32 g_vendor_md_btn_scene_vc_s;
+extern u32 g_vendor_md_btn_scene_vc_c;
 extern u16 publish_powerup_random_ms;
 
 extern u16 sub_adr_onoff ;

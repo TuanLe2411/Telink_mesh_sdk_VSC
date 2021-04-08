@@ -37,6 +37,16 @@
 
 #if (VENDOR_MD_NORMAL_EN)
 model_vd_light_t       	model_vd_light;
+model_vendor_btn_scene_t 	model_vd_btn_scene;
+
+//------------BTN_SCENE_BEGIN
+	//--------------BTN_SCENE_HEADER_OPCODE
+	#define BTN_SAVE_CLICK_MODE			0x0101
+	#define BTN_DELETE_CLICK_MODE		0x0102
+	//--------------BTN_ACTION_STATE
+	#define BTN_ACTION_SUCCESS			0
+	#define BTN_ACTION_FAILURE			-1	
+//-----------BTN_SCENE_END
 
 #if (DUAL_VENDOR_EN)
 STATIC_ASSERT((VENDOR_MD_LIGHT_S && 0xffff) != VENDOR_ID_MI);
@@ -97,6 +107,100 @@ int vd_light_onoff_st_publish(u8 light_idx)
     return vd_light_tx_cmd_onoff_st(light_idx, 0, ele_adr, pub_adr, uuid, p_com_md);
 #endif
 }
+
+//---------------BTN_SCENE_BEGIN
+int btn_scene_set_sts(int state, u16 ele_adr, u16 dst_adr, model_btn_scene_receive_t* btn_set){
+	model_btn_scene_response_t state_res = {0};
+	
+	if(state == BTN_ACTION_SUCCESS){
+		state_res.header = btn_set->header;
+		state_res.bid = btn_set->bid;
+		state_res.mid = btn_set->mid;
+		state_res.sceneId = btn_set->sceneId;
+		state_res.appId = btn_set->appId;
+		mesh_tx_cmd_rsp(VD_BTN_SCENE_STATUS, (u8 *)&state_res, sizeof(state_res), ele_adr, dst_adr, 0, 0);
+		return 0;
+	}
+	if(state == BTN_ACTION_FAILURE){
+		return 0;
+	}
+}
+
+int get_current_written_btn_scene_location(){
+	int count = 0;
+	for(int i = 0; i< MAX_SCENE_SAVE; i++){
+		if(model_vd_btn_scene.btn[0][i].writted == 0) break;
+		count = count + 1; 
+	}
+	return count;
+}
+
+int get_btn_scene_loc_by_bid_and_mid(u8 btn, u8 mod, int wn){
+	int count = 0;
+	for(int i = 0; i< wn; i++){
+		if((model_vd_btn_scene.btn[0][i].bid == btn)&&(model_vd_btn_scene.btn[0][i].mid == mod)) break;
+		count = count + 1;
+	}
+	return count;
+}
+
+void save_btn_scene_into_model(model_btn_scene_receive_t* btn_set, int *loc, mesh_cb_fun_par_t *cb_par){
+	int save_loc = get_btn_scene_loc_by_bid_and_mid(btn_set->bid, btn_set->mid, *loc);
+	if(*loc > MAX_SCENE_SAVE){
+		return ;
+	}
+	model_vd_btn_scene.btn[0][save_loc].writted = 0x01;
+	model_vd_btn_scene.btn[0][save_loc].bid = btn_set->bid;
+	model_vd_btn_scene.btn[0][save_loc].mid = btn_set->mid;
+	model_vd_btn_scene.btn[0][save_loc].sceneId = btn_set->sceneId;
+	model_vd_btn_scene.btn[0][save_loc].appId = btn_set->appId;
+	if(save_loc == *loc){
+		*loc = *loc + 1;
+		model_g_light_s_t *p_model = (model_g_light_s_t *)cb_par->model;
+		btn_scene_set_sts(BTN_ACTION_SUCCESS, p_model->com.ele_adr, cb_par->adr_src, btn_set);
+		return ;
+	}
+	model_g_light_s_t *p_model = (model_g_light_s_t *)cb_par->model;
+	btn_scene_set_sts(BTN_ACTION_SUCCESS, p_model->com.ele_adr, cb_par->adr_src, btn_set);
+	return;
+}
+
+void del_btn_scene_into_model(model_btn_scene_receive_t* btn_set, int *loc, mesh_cb_fun_par_t *cb_par){
+	if(*loc > MAX_SCENE_SAVE){
+		return ;
+	}
+	int del_loc = get_btn_scene_loc_by_bid_and_mid(btn_set->bid, btn_set->mid, *loc);
+	if(del_loc == *loc){
+		return ;
+	}
+	for(int i = del_loc; i< (MAX_SCENE_SAVE - 1); i++){
+		model_vd_btn_scene.btn[0][i] = model_vd_btn_scene.btn[0][i+1];
+	}
+	*loc = *loc - 1;
+	return ;
+}
+
+int cb_vd_btn_scene_set(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
+	model_btn_scene_receive_t* btn_set = (model_btn_scene_receive_t *)par;
+	static u8 wn = 0;
+	if(wn == 0){
+		wn = get_current_written_btn_scene_location();
+	}
+
+	switch (btn_set->header)
+	{
+		case 0x0101:
+			save_btn_scene_into_model(btn_set, &wn, cb_par);
+			break;
+		case 0x0102:
+			del_btn_scene_into_model(btn_set, &wn, cb_par);
+			break;
+		default:
+			break;
+	}
+	return 0;
+}
+//---------------BTN_SCENE_END
 
 // --------- vendor LPN GATT ota mode set  --------
 #if FEATURE_LOWPOWER_EN
@@ -482,6 +586,9 @@ int cb_vd_msg_attr_upd_time_rsp(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par)
 #define cb_vd_msg_attr_get          (0)
 #define cb_vd_msg_attr_set          (0)
 #define cb_vd_msg_attr_confirm      (0)
+
+#define cb_vd_btn_scene_set			(0)
+
 #if ALI_MD_TIME_EN
 #define cb_vd_msg_attr_upd_time_req	(0)
 #define cb_vd_msg_attr_upd_time_rsp	(0)
@@ -506,9 +613,23 @@ int cb_vd_msg_attr_status(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par)
     }
     return err;
 }
+
+//-----------BTN_SCENE_BEGIN
+
+int cb_vd_btn_scene_sts(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
+	int err = 0;
+    if(cb_par->model){  // model may be Null for status message
+        //model_client_common_t *p_model = (model_client_common_t *)(cb_par->model);
+    }
+    return err;
+}
+
+//-----------BTN_SCENE_END
 #else
 #define cb_vd_group_g_status            (0)
 #define cb_vd_msg_attr_status           (0)
+
+#define cb_vd_btn_scene_sts				(0)
 #endif
 
 // ------ both server or GW / APP support --------
@@ -874,6 +995,11 @@ mesh_cmd_sig_func_t mesh_cmd_vd_func[] = {
     {VD_LPN_SENSOR_GET,0,VENDOR_MD_LIGHT_C,VENDOR_MD_LIGHT_S,cb_vd_lpn_sensor_get,VD_LPN_SENSOR_STATUS},
     {VD_LPN_SENSOR_STATUS, 1, VENDOR_MD_LIGHT_S, VENDOR_MD_LIGHT_C, cb_vd_lpn_sensor_sts, STATUS_NONE},
     #endif
+
+	#if	(VD_BTN_SCENE_EN)
+		{VD_BTN_SCENE_SET, 0, VENDOR_MD_BTN_SCENE_C, VENDOR_MD_BTN_SCENE_S, cb_vd_btn_scene_set, VD_BTN_SCENE_STATUS},
+		{VD_BTN_SCENE_STATUS, 1, VENDOR_MD_BTN_SCENE_S, VENDOR_MD_BTN_SCENE_C, cb_vd_btn_scene_sts, STATUS_NONE},
+	#endif
 #endif
 
     USER_MESH_CMD_VD_ARRAY

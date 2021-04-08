@@ -1775,12 +1775,14 @@ u8* mesh_find_ele_resource_in_model(u16 ele_adr, u32 model_id, bool4 sig_model, 
 #if WIN32
     #if MD_SERVER_EN
         IF_find_ele_resource(p_model,g_vendor_md_light_vc_s,model_vd_light.srv);
+        IF_find_ele_resource(p_model,g_vendor_md_btn_scene_vc_s,model_vd_btn_scene.srv);
             #if MD_VENDOR_2ND_EN
         IF_find_ele_resource(p_model,g_vendor_md_light_vc_s2,model_vd_light.srv2);
             #endif
     #endif
     #if MD_CLIENT_VENDOR_EN
         IF_find_ele_resource(p_model,g_vendor_md_light_vc_c,model_vd_light.clnt);
+        IF_find_ele_resource(p_model,g_vendor_md_btn_scene_vc_c,model_vd_btn_scene.clnt);
     #endif
 #else
     #if (VENDOR_MD_MI_EN)
@@ -1801,22 +1803,26 @@ u8* mesh_find_ele_resource_in_model(u16 ele_adr, u32 model_id, bool4 sig_model, 
     #else
         #if MD_SERVER_EN
         u32 model_vd_id_srv = VENDOR_MD_LIGHT_S;
+        u32 model_vd_btn_scene_srv = VENDOR_MD_BTN_SCENE_S;
             #if MD_VENDOR_2ND_EN
         u32 model_vd_id_srv2 = VENDOR_MD_LIGHT_S2;
             #endif
         #endif
         #if MD_CLIENT_VENDOR_EN
         u32 model_vd_id_clnt = VENDOR_MD_LIGHT_C;
+        u32 model_vd_btn_scene_clnt = VENDOR_MD_BTN_SCENE_C;
         #endif
     #endif
     
     #if MD_SERVER_EN
         IF_find_ele_resource(p_model,model_vd_id_srv,model_vd_light.srv);
+        IF_find_ele_resource(p_model,model_vd_btn_scene_srv,model_vd_btn_scene.srv);
         #if MD_VENDOR_2ND_EN
         IF_find_ele_resource(p_model,model_vd_id_srv2,model_vd_light.srv2);
         #endif
     #endif
     #if MD_CLIENT_VENDOR_EN
+        IF_find_ele_resource(p_model,model_vd_btn_scene_clnt,model_vd_btn_scene.clnt);
         IF_find_ele_resource(p_model,model_vd_id_clnt,model_vd_light.clnt);
     #endif
 #endif
@@ -1842,12 +1848,15 @@ void mesh_model_ele_adr_init()
 	
 	#if MD_SERVER_EN
 	MODEL_ELE_ADR_INIT(model_vd_light.srv);
+    MODEL_ELE_ADR_INIT(model_vd_btn_scene.srv);
         #if MD_VENDOR_2ND_EN
 	MODEL_ELE_ADR_INIT(model_vd_light.srv2);
         #endif
 	#endif
 	#if MD_CLIENT_VENDOR_EN
 	MODEL_ELE_ADR_INIT(model_vd_light.clnt);
+    MODEL_ELE_ADR_INIT(model_vd_btn_scene.clnt);
+
 	#endif
 }
 

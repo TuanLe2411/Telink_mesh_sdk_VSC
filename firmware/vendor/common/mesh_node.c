@@ -241,7 +241,7 @@ STATIC_ASSERT((MESH_DLE_MODE == MESH_DLE_MODE_EXTEND_BEAR) && (DLE_LEN_MAX_RX ==
     #if (VENDOR_MD_MI_EN)	// default use vendor mi for dual vendor.
 #define MD_ID_ARRAY_VENDOR_SERVER1       MIOT_SEPC_VENDOR_MODEL_SER,
     #elif (VENDOR_MD_NORMAL_EN)
-#define MD_ID_ARRAY_VENDOR_SERVER1       VENDOR_MD_LIGHT_S,
+#define MD_ID_ARRAY_VENDOR_SERVER1       VENDOR_MD_LIGHT_S, VENDOR_MD_BTN_SCENE_S,
     #endif
 #else
 #define MD_ID_ARRAY_VENDOR_SERVER1       
@@ -251,7 +251,7 @@ STATIC_ASSERT((MESH_DLE_MODE == MESH_DLE_MODE_EXTEND_BEAR) && (DLE_LEN_MAX_RX ==
     #if (VENDOR_MD_MI_EN)
 #define MD_ID_ARRAY_VENDOR_CLIENT       MIOT_SEPC_VENDOR_MODEL_CLI,
     #elif (VENDOR_MD_NORMAL_EN)
-#define MD_ID_ARRAY_VENDOR_CLIENT       VENDOR_MD_LIGHT_C,
+#define MD_ID_ARRAY_VENDOR_CLIENT       VENDOR_MD_LIGHT_C, VENDOR_MD_BTN_SCENE_C,
     #endif
 #else
 #define MD_ID_ARRAY_VENDOR_CLIENT       
@@ -2737,6 +2737,7 @@ extern u32 mesh_md_light_hsl_addr;
 #endif
 // share area end
 static u32 mesh_md_vd_light_addr = FLASH_ADR_MD_VD_LIGHT;
+static u32 mesh_md_vd_btn_scene_addr = FLASH_ADR_MD_BTN_SCENE;
 
 #if !WIN32
 const 
@@ -2748,6 +2749,8 @@ mesh_md_adr_map_t mesh_md_adr_map[] = {
     {0, {MIOT_SEPC_VENDOR_MODEL_SER, MIOT_SEPC_VENDOR_MODEL_CLI, MIOT_VENDOR_MD_SER, -1, -1, -1}, FLASH_ADR_MD_VD_LIGHT}, // must first
 #else// (VENDOR_MD_NORMAL_EN)
 	{0, {VENDOR_MD_LIGHT_S, VENDOR_MD_LIGHT_C, VENDOR_MD_LIGHT_S2, -1, -1, -1}, FLASH_ADR_MD_VD_LIGHT}, // must first
+	{0, {VENDOR_MD_BTN_SCENE_S, VENDOR_MD_BTN_SCENE_C, -1, -1, -1, -1}, FLASH_ADR_MD_BTN_SCENE}, // must first
+
 #endif
 	{1, {SIG_MD_CFG_SERVER, -1, -1, -1, -1, -1}, FLASH_ADR_MD_CFG_S},
 	{1, {SIG_MD_HEALTH_SERVER, SIG_MD_HEALTH_CLIENT, -1, -1, -1, -1}, FLASH_ADR_MD_HEALTH},
@@ -2851,6 +2854,7 @@ const mesh_save_map_t mesh_save_map[] = {
 	{FLASH_ADR_MD_DF, (u8 *)&model_sig_df_cfg, &mesh_md_df_addr, sizeof(model_sig_df_cfg)},
 #endif
 	{FLASH_ADR_MD_VD_LIGHT, (u8 *)&model_vd_light, &mesh_md_vd_light_addr, sizeof(model_vd_light)},
+	{FLASH_ADR_MD_BTN_SCENE, (u8 *)&model_vd_btn_scene, &mesh_md_vd_btn_scene_addr, sizeof(model_vd_btn_scene)},
 #if (ALI_MD_TIME_EN)
 	{FLASH_ADR_VD_TIME_INFO, (u8 *)&model_vd_ali_time, &mesh_md_vd_ali_time_addr, sizeof(model_vd_ali_time)},
 #endif
@@ -2878,7 +2882,11 @@ void APP_set_vd_id_mesh_save_map(u16 vd_id)
 		#endif
         }else if(p_map->md_id[i] == VENDOR_MD_LIGHT_C){
             p_map->md_id[i] = g_vendor_md_light_vc_c;
-        }
+        }else if(p_map->md_id[i] == VENDOR_MD_BTN_SCENE_S){
+			p_map->md_id[i] = g_vendor_md_btn_scene_vc_s
+		}else if(p_map->md_id[i] == VENDOR_MD_BTN_SCENE_C){
+			p_map->md_id[i] = g_vendor_md_btn_scene_vc_c
+		}
     }
     APP_set_vd_id_cps(vd_id);
 }
@@ -3576,6 +3584,9 @@ void mesh_flash_retrieve()
 
     model_vd_light.srv[0].com.bind_key[0].bind_ok = 1;
     model_vd_light.clnt[0].com.bind_key[0].bind_ok = 1;
+	
+    model_vd_btn_scene.srv[0].com.bind_key[0].bind_ok = 1;
+    model_vd_btn_scene.clnt[0].com.bind_key[0].bind_ok = 1;
 #endif
 }
 

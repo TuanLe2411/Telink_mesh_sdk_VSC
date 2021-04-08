@@ -60,6 +60,7 @@ LS_FLAGS := $(TEL_PATH)/firmware/boot.link
 -include $(TEL_PATH)/make/driver.mk
 -include $(TEL_PATH)/make/proj.mk
 -include $(TEL_PATH)/make/vendor_common.mk
+-include $(TEL_PATH)/make/user_lib.mk
 
 -include $(PROJECT_PATH)/app.mk
 

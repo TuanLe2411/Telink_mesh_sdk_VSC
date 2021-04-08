@@ -35,16 +35,10 @@
 	#elif(MCU_CORE_TYPE == MCU_CORE_8258)
 		#if (__PROJECT_NODE_GENERAL__)
 			#include "../project/mesh_node_general/app/app_config_8258.h"
-		#elif (__PROJECT_NODE_LIGHT__)
-			#include "../project/mesh_node_light/app/app_config_8258.h"
-		#elif (__PROJECT_NODE_SWITCH__)
-			#include "../project/mesh_node_switch/app/app_config_8258.h"
 		#elif (__PROJECT_NODE_DIM__)
 			#include "../project/mesh_node_dim/app/app_config_8258.h"
-		#elif (__PROJECT_NODE_SWITCH_TEST__)
-			#include "../project/mesh_node_switch(test)/app/app_config_8258.h"
-		#elif (__PROJECT_NODE_BRIDGE__)
-			#include "../project/mesh_node_bridge/app/app_config_8258.h"
+		#elif (__PROJECT_NODE_LCD__)
+			#include "../project/mesh_node_lcd/app/app_config_8258.h"
 		#else
 			#include "../mesh/app_config_8258.h"
 		#endif

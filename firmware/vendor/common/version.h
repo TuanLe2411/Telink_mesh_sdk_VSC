@@ -45,6 +45,8 @@
 // ------ SPIRIT_LPN ------
 #define PID_SPIRIT_LPN          (0x0401)
 
+#define PID_LCD                 (0x0501)
+
 /*
 MESH_PID_SEL : PID is product ID,
 MESH_VID: VID is software version ID,
@@ -79,12 +81,23 @@ format: please refer to spec "4.2.1.1 Composition Data Page 0"
 #define MESH_PID_SEL		(PID_UNKNOW)
 #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
 #elif (__PROJECT_MESH__)   // light
-#define MESH_PID_SEL		(LIGHT_TYPE_SEL)
-	#if DU_ENABLE
-#define MESH_VID		    DU_FW_VER       // in the du mode ,we will use to set version .
-	#else
-#define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
-	#endif
+    #if (__PROJECT_NODE_DIM__)
+        #define MESH_PID_SEL		(PID_DIM)
+        #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
+    #elif (__PROJECT_NODE_SWITCH__)
+        #define MESH_PID_SEL		(PID_SWITCH)
+        #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
+    #elif (__PROJECT_NODE_LCD__)
+        #define MESH_PID_SEL		(PID_LCD)
+        #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
+    #else
+        #define MESH_PID_SEL		(LIGHT_TYPE_SEL)
+	    #if DU_ENABLE
+            #define MESH_VID		    DU_FW_VER       // in the du mode ,we will use to set version .
+	    #else
+            #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
+	    #endif
+    #endif
 #elif (__PROJECT_MESH_GW_NODE_HK__)   // light
 #define MESH_PID_SEL		(LIGHT_TYPE_SEL)
 #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine

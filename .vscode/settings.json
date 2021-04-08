@@ -1,6 +1,9 @@
 {
     "files.associations": {
         "*.inc": "cpp",
-        "ll_whitelist.h": "c"
-    }
+        "ll_whitelist.h": "c",
+        "vendor_model.h": "c",
+        "app_serial.h": "c"
+    },
+    "C_Cpp.dimInactiveRegions": false
 }

@@ -234,6 +234,7 @@ typedef struct {
 #define			FLASH_ADR_MD_VD_LIGHT		FLASH_ADR_AREA_2_START
 #define			FLASH_ADR_MD_G_POWER_ONOFF	0x71000
 #define			FLASH_ADR_MD_SCENE			0x72000
+#define 		FLASH_ADR_MD_BTN_SCENE		0x7C000
 
 #define			FLASH_ADR_MESH_TYPE_FLAG	0x73000	// don't change, must same with telink mesh SDK
 #define			FLASH_ADR_MD_MESH_OTA		0x74000

@@ -26,6 +26,9 @@
 
 #if (VENDOR_MD_NORMAL_EN)
 // vendor model id
+#define VENDOR_MD_BTN_SCENE_S               ((0x0003<<16) | (TEMP_VD_ID_MODEL))
+#define VENDOR_MD_BTN_SCENE_C               ((0x0004<<16) | (TEMP_VD_ID_MODEL))
+
 #if TESTCASE_FLAG_ENABLE
 #define VENDOR_MD_LIGHT_S               ((0x0000<<16) | (0))
 #define VENDOR_MD_LIGHT_C               ((0x0001<<16) | (0))
@@ -103,6 +106,12 @@
 #define VD_LPN_SENSOR_STATUS            0xE1    // user can use this op code for other fuction
     #endif
 
+	//--------BTN_SCENE_BEGIN
+	#if (VD_BTN_SCENE_EN)
+		#define VD_BTN_SCENE_SET					0xE2
+		#define VD_BTN_SCENE_STATUS					0xE3
+	#endif
+	//--------BTN_SCENE_END
 //------ end
 #endif
 
