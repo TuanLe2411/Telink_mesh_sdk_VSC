@@ -1,1 +1,0 @@
-Project mesh_node_bridge is source code of a device, which help un-bluetooth device can communicate with Bluetooth mesh network.

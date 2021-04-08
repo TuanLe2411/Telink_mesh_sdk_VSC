@@ -1,1 +1,0 @@
-Project mesh_node_light is source  code of a light in smart light system
