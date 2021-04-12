@@ -8,8 +8,8 @@
 
 #define SCENE_CALL_FUNC   0x5000
 
-#define SCENE_CALL_SUCCESS_PAGE_ID     0x08     
-#define SCENE_CALL_FAILURE_PAGE_ID     0x09
+#define SCENE_CALL_SUCCESS_PAGE_ID     0x09     
+#define SCENE_CALL_FAILURE_PAGE_ID     0x08
 
 typedef enum {
     SCENE_CALL_SUCCESS=0,
