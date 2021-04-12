@@ -1816,13 +1816,17 @@ u8* mesh_find_ele_resource_in_model(u16 ele_adr, u32 model_id, bool4 sig_model, 
     
     #if MD_SERVER_EN
         IF_find_ele_resource(p_model,model_vd_id_srv,model_vd_light.srv);
+        #if VD_BTN_SCENE_EN
         IF_find_ele_resource(p_model,model_vd_btn_scene_srv,model_vd_btn_scene.srv);
+        #endif
         #if MD_VENDOR_2ND_EN
         IF_find_ele_resource(p_model,model_vd_id_srv2,model_vd_light.srv2);
         #endif
     #endif
     #if MD_CLIENT_VENDOR_EN
+        #if VD_BTN_SCENE_EN
         IF_find_ele_resource(p_model,model_vd_btn_scene_clnt,model_vd_btn_scene.clnt);
+        #endif
         IF_find_ele_resource(p_model,model_vd_id_clnt,model_vd_light.clnt);
     #endif
 #endif
@@ -1848,14 +1852,18 @@ void mesh_model_ele_adr_init()
 	
 	#if MD_SERVER_EN
 	MODEL_ELE_ADR_INIT(model_vd_light.srv);
+    #if VD_BTN_SCENE_EN
     MODEL_ELE_ADR_INIT(model_vd_btn_scene.srv);
+    #endif
         #if MD_VENDOR_2ND_EN
 	MODEL_ELE_ADR_INIT(model_vd_light.srv2);
         #endif
 	#endif
 	#if MD_CLIENT_VENDOR_EN
 	MODEL_ELE_ADR_INIT(model_vd_light.clnt);
+    #if VD_BTN_SCENE_EN
     MODEL_ELE_ADR_INIT(model_vd_btn_scene.clnt);
+    #endif
 
 	#endif
 }

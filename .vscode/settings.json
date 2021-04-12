@@ -3,7 +3,9 @@
         "*.inc": "cpp",
         "ll_whitelist.h": "c",
         "vendor_model.h": "c",
-        "app_serial.h": "c"
+        "app_serial.h": "c",
+        "user_ali_time.h": "c",
+        "uart.h": "c"
     },
     "C_Cpp.dimInactiveRegions": false
 }

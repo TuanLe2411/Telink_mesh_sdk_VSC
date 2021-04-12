@@ -26,8 +26,8 @@
 #include "proj_lib/ble/l2cap.h"
 #include "proj_lib/ble/ble_common.h"
 
-#include "user_lib/app_serial.h"
-#include "user_lib/app_lcd_handler.h"
+#include "app_serial.h"
+#include "app_lcd_handler.h"
 #if MI_API_ENABLE
 #include "mesh/mi_api/telink_sdk_mible_api.h"
 #include "mesh/mi_api/certi/mijia_profiles/mi_service_server.h"

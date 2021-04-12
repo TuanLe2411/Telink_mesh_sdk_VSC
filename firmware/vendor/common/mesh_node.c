@@ -2854,7 +2854,9 @@ const mesh_save_map_t mesh_save_map[] = {
 	{FLASH_ADR_MD_DF, (u8 *)&model_sig_df_cfg, &mesh_md_df_addr, sizeof(model_sig_df_cfg)},
 #endif
 	{FLASH_ADR_MD_VD_LIGHT, (u8 *)&model_vd_light, &mesh_md_vd_light_addr, sizeof(model_vd_light)},
+	#if VD_BTN_SCENE_EN
 	{FLASH_ADR_MD_BTN_SCENE, (u8 *)&model_vd_btn_scene, &mesh_md_vd_btn_scene_addr, sizeof(model_vd_btn_scene)},
+	#endif
 #if (ALI_MD_TIME_EN)
 	{FLASH_ADR_VD_TIME_INFO, (u8 *)&model_vd_ali_time, &mesh_md_vd_ali_time_addr, sizeof(model_vd_ali_time)},
 #endif
@@ -3584,9 +3586,10 @@ void mesh_flash_retrieve()
 
     model_vd_light.srv[0].com.bind_key[0].bind_ok = 1;
     model_vd_light.clnt[0].com.bind_key[0].bind_ok = 1;
-	
+	#if VD_BTN_SCENE_EN
     model_vd_btn_scene.srv[0].com.bind_key[0].bind_ok = 1;
     model_vd_btn_scene.clnt[0].com.bind_key[0].bind_ok = 1;
+	#endif
 #endif
 }
 

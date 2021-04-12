@@ -107,10 +107,12 @@
     #endif
 
 	//--------BTN_SCENE_BEGIN
-	#if (VD_BTN_SCENE_EN)
-		#define VD_BTN_SCENE_SET					0xE2
-		#define VD_BTN_SCENE_STATUS					0xE3
-	#endif
+#define VD_BTN_SCENE_SET					0xE2
+#define VD_BTN_SCENE_STATUS					0xE3
+
+#define RD_OPCODE_TYPE_DEVICE_SEND			(0xE0)
+#define RD_OPCODE_TYPE_DEVICE_RSP			(0xE1)
+
 	//--------BTN_SCENE_END
 //------ end
 #endif

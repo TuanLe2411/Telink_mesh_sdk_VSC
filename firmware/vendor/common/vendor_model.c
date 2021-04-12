@@ -37,8 +37,10 @@
 
 #if (VENDOR_MD_NORMAL_EN)
 model_vd_light_t       	model_vd_light;
-model_vendor_btn_scene_t 	model_vd_btn_scene;
 
+#if VD_BTN_SCENE_EN
+model_vendor_btn_scene_t 	model_vd_btn_scene;
+#endif
 //------------BTN_SCENE_BEGIN
 	//--------------BTN_SCENE_HEADER_OPCODE
 	#define BTN_SAVE_CLICK_MODE			0x0101
@@ -109,6 +111,7 @@ int vd_light_onoff_st_publish(u8 light_idx)
 }
 
 //---------------BTN_SCENE_BEGIN
+#if VD_BTN_SCENE_EN
 int btn_scene_set_sts(int state, u16 ele_adr, u16 dst_adr, model_btn_scene_receive_t* btn_set){
 	model_btn_scene_response_t state_res = {0};
 	
@@ -119,11 +122,10 @@ int btn_scene_set_sts(int state, u16 ele_adr, u16 dst_adr, model_btn_scene_recei
 		state_res.sceneId = btn_set->sceneId;
 		state_res.appId = btn_set->appId;
 		mesh_tx_cmd_rsp(VD_BTN_SCENE_STATUS, (u8 *)&state_res, sizeof(state_res), ele_adr, dst_adr, 0, 0);
-		return 0;
 	}
 	if(state == BTN_ACTION_FAILURE){
-		return 0;
 	}
+	return 0;
 }
 
 int get_current_written_btn_scene_location(){
@@ -200,7 +202,12 @@ int cb_vd_btn_scene_set(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
 	}
 	return 0;
 }
+#endif
 //---------------BTN_SCENE_END
+
+int RD_Messenger_Process_Type_Device(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
+	return 0;
+}
 
 // --------- vendor LPN GATT ota mode set  --------
 #if FEATURE_LOWPOWER_EN
@@ -577,6 +584,7 @@ int cb_vd_msg_attr_upd_time_rsp(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par)
 	return 0;
 }
 
+
 #endif
 
 #endif
@@ -587,6 +595,7 @@ int cb_vd_msg_attr_upd_time_rsp(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par)
 #define cb_vd_msg_attr_set          (0)
 #define cb_vd_msg_attr_confirm      (0)
 
+#define RD_Messenger_Process_Type_Device	(0)
 #define cb_vd_btn_scene_set			(0)
 
 #if ALI_MD_TIME_EN
@@ -624,11 +633,19 @@ int cb_vd_btn_scene_sts(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
     return err;
 }
 
+int RD_Messenger_Process_Null(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
+	int err = 0;
+    if(cb_par->model){  // model may be Null for status message
+        //model_client_common_t *p_model = (model_client_common_t *)(cb_par->model);
+    }
+    return err;
+}
+
 //-----------BTN_SCENE_END
 #else
 #define cb_vd_group_g_status            (0)
 #define cb_vd_msg_attr_status           (0)
-
+#define RD_Messenger_Process_Null		(0)
 #define cb_vd_btn_scene_sts				(0)
 #endif
 
@@ -1000,8 +1017,11 @@ mesh_cmd_sig_func_t mesh_cmd_vd_func[] = {
 		{VD_BTN_SCENE_SET, 0, VENDOR_MD_BTN_SCENE_C, VENDOR_MD_BTN_SCENE_S, cb_vd_btn_scene_set, VD_BTN_SCENE_STATUS},
 		{VD_BTN_SCENE_STATUS, 1, VENDOR_MD_BTN_SCENE_S, VENDOR_MD_BTN_SCENE_C, cb_vd_btn_scene_sts, STATUS_NONE},
 	#endif
-#endif
 
+
+#endif
+	{RD_OPCODE_TYPE_DEVICE_SEND,0,VENDOR_MD_LIGHT_C,VENDOR_MD_LIGHT_S,RD_Messenger_Process_Type_Device,RD_OPCODE_TYPE_DEVICE_RSP},
+    {RD_OPCODE_TYPE_DEVICE_RSP,1,VENDOR_MD_LIGHT_S,VENDOR_MD_LIGHT_C,RD_Messenger_Process_Null,STATUS_NONE},
     USER_MESH_CMD_VD_ARRAY
 };
 

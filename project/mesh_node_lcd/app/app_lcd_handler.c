@@ -1,5 +1,6 @@
 #include "app_lcd_handler.h"
 #include "app_serial.h"
+#include "user_lib/app_serial.h"
 #include "proj/common/tstring.h"
 #include "vendor/common/scene.h"
 #include "proj_lib/sig_mesh/app_mesh.h"

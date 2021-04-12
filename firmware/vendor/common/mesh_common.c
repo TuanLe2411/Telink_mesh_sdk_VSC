@@ -199,13 +199,17 @@ MYFIFO_INIT(hci_tx_fifo, HCI_TX_FIFO_SIZE, HCI_TX_FIFO_NUM); // include adv pkt 
 
 
 #if (IS_VC_PROJECT)
-MYFIFO_INIT(hci_rx_fifo, 512, 4);   // max play load 382
+	MYFIFO_INIT(hci_rx_fifo, 512, 4);   // max play load 382
+#elif (VD_BTN_SCENE_EN)
+	#define UART_DATA_SIZE              (MESH_LONG_PACKET_EN ? 280 : 24)    // increase or decrease 16bytes for each step.
+	#define HCI_RX_FIFO_SIZE            (UART_DATA_SIZE + 4 + 4)    // 4: sizeof DMA len;  4: margin reserve(can't reveive valid data, because UART_DATA_SIZE is max value of DMA len)
+	STATIC_ASSERT(HCI_RX_FIFO_SIZE % 16 == 0);
+	MYFIFO_INIT(hci_rx_fifo, HCI_RX_FIFO_SIZE, 4);
 #else
-#define UART_DATA_SIZE              (MESH_LONG_PACKET_EN ? 280 : 72)    // increase or decrease 16bytes for each step.
-#define HCI_RX_FIFO_SIZE            (UART_DATA_SIZE + 4 + 4)    // 4: sizeof DMA len;  4: margin reserve(can't reveive valid data, because UART_DATA_SIZE is max value of DMA len)
-STATIC_ASSERT(HCI_RX_FIFO_SIZE % 16 == 0);
-
-MYFIFO_INIT(hci_rx_fifo, HCI_RX_FIFO_SIZE, 4);
+	#define UART_DATA_SIZE              (MESH_LONG_PACKET_EN ? 280 : 72)    // increase or decrease 16bytes for each step.
+	#define HCI_RX_FIFO_SIZE            (UART_DATA_SIZE + 4 + 4)    // 4: sizeof DMA len;  4: margin reserve(can't reveive valid data, because UART_DATA_SIZE is max value of DMA len)
+	STATIC_ASSERT(HCI_RX_FIFO_SIZE % 16 == 0);
+	MYFIFO_INIT(hci_rx_fifo, HCI_RX_FIFO_SIZE, 4);
 #endif
 #endif
 

@@ -587,6 +587,7 @@ extern "C" {
     #define MD_BATTERY_EN				0
     #define MD_DF_EN					0
     #define MD_SBR_EN					0
+    #define VD_BTN_SCENE_EN             0
 
     #define MD_SERVER_EN                1   // SIG and vendor MD
     #define MD_CLIENT_EN                0   // just SIG MD

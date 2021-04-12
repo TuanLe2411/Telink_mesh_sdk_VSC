@@ -1724,8 +1724,9 @@ extern model_mesh_ota_t        	model_mesh_ota;
 // extern model_g_power_level_t    model_sig_g_power_level; // share with model_sig_lightness
 
 extern model_vd_light_t       	model_vd_light;
+#if VD_BTN_SCENE_EN
 extern model_vendor_btn_scene_t 	model_vd_btn_scene;
-
+#endif
 extern mesh_key_t mesh_key; 
 extern friend_key_t mesh_fri_key_lpn[NET_KEY_MAX][2];
 extern friend_key_t mesh_fri_key_fn[MAX_LPN_NUM][2];
