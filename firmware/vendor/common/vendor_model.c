@@ -182,19 +182,29 @@ void del_btn_scene_into_model(model_btn_scene_receive_t* btn_set, int *loc, mesh
 	return ;
 }
 
+int is_btn_scene_set_data_valid(model_btn_scene_receive_t* btn_set){
+
+	return 1;
+}
+
 int cb_vd_btn_scene_set(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
 	model_btn_scene_receive_t* btn_set = (model_btn_scene_receive_t *)par;
+	if(!is_btn_scene_set_data_valid(btn_set)){
+		return;
+	}
 	static u8 wn = 0;
 	if(wn == 0){
 		wn = get_current_written_btn_scene_location();
 	}
-
+	if(wn >= MAX_SCENE_SAVE){
+		return;
+	}
 	switch (btn_set->header)
 	{
-		case 0x0101:
+		case BTN_SAVE_CLICK_MODE:
 			save_btn_scene_into_model(btn_set, &wn, cb_par);
 			break;
-		case 0x0102:
+		case BTN_DELETE_CLICK_MODE:
 			del_btn_scene_into_model(btn_set, &wn, cb_par);
 			break;
 		default:
