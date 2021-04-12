@@ -1,5 +1,5 @@
-#ifndef __APP_SERIAL_H__
-#define __APP_SERIAL_H__
+#ifndef __SERIAL_H__
+#define __SERIAL_H__
 #include "proj/common/types.h"
 ///////////uart//////////////////
 

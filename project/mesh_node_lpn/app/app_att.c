@@ -23,10 +23,10 @@
 #include "proj_lib/ble/ll/ll.h"
 #include "proj_lib/ble/blt_config.h"
 #include "proj_lib/ble/service/ble_ll_ota.h"
-#include "../common/app_provison.h"
-#include "../common/app_proxy.h"
+#include "vendor/common/app_provison.h"
+#include "vendor/common/app_proxy.h"
 #include "proj_lib/sig_mesh/app_mesh.h"
-#include "../common/app_beacon.h"
+#include "vendor/common/app_beacon.h"
 
 #if(1)
 

@@ -1,6 +1,6 @@
 #include "app_lcd_handler.h"
 #include "app_serial.h"
-#include "user_lib/app_serial.h"
+#include "user_lib/serial.h"
 #include "proj/common/tstring.h"
 #include "vendor/common/scene.h"
 #include "proj_lib/sig_mesh/app_mesh.h"
@@ -52,10 +52,6 @@ void module_change_lcd_page(u8 pageId){
     uart_print_data(uart_response, sizeof(uart_response)/sizeof(char), 0, 0);
 }
 
-void module_handler_btn_onclick_itself(u8 btn_onclick, u8 btn_mode){
-    return;
-}
-
 void module_send_response_to_lcd(MODULE_RESPONSE_TO_LCD_OPCODE op){
 
     #ifdef LCD_TYPE
@@ -79,8 +75,7 @@ void module_handler_scene_btn_onclick(u8 btn_onclick, u8 btn_mode){
         access_cmd_scene_recall(ADR_ALL_NODES, 0, 0x0001, CMD_NO_ACK, 0);
     #endif
 
-    module_send_btn_onclick_to_hc(btn_onclick, btn_mode);
-    module_handler_btn_onclick_itself(btn_onclick, btn_mode);
+    module_handler_btn_onclick(btn_onclick, btn_mode);
     module_send_response_to_lcd(SCENE_CALL_SUCCESS);
 }
 //------SCENE CALL END-------//

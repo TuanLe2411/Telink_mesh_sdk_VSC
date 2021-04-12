@@ -1,4 +1,4 @@
-#include "app_serial.h"
+#include "serial.h"
 #include "proj/drivers/uart.h"
 #include "proj_lib/sig_mesh/app_mesh.h"
 #include "proj/common/tstring.h"

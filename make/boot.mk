@@ -10,7 +10,7 @@ $(OUT_PATH)/boot/8258/cstartup_8258_RET_16K.o \
 # Each subdirectory must supply rules for building sources it contributes
 $(OUT_PATH)/boot/8258/%.o: $(TEL_PATH)/firmware/boot/8258/%.S
 	@echo 'Building file: $<'
-	@tc32-elf-gcc -DMCU_STARTUP_8258_RET_16K -D__PROJECT_MESH__=1 -DCHIP_TYPE=CHIP_TYPE_8258 $(INCLUDE_PATHS) -c -o"$@" "$<"
+	@tc32-elf-gcc -DMCU_STARTUP_8258_RET_16K -D__PROJECT_MESH_LPN__=1 -DCHIP_TYPE=CHIP_TYPE_8258 $(INCLUDE_PATHS) -c -o"$@" "$<"
 
 
 

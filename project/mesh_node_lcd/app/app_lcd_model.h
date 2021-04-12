@@ -16,9 +16,11 @@ typedef struct btn_onclick_data_status{
     u16 appId;
 }btn_onclick_data_status;
 
+typedef struct {
+    u16 header;
+    u16 appId
+}rgb_scene_call;
 
-
-extern void module_send_btn_onclick_to_hc(u8 btn_onclick, u8 btn_mode);
-
+extern void module_handler_btn_onclick(u8 btn_onclick, u8 btn_mode);
 
 #endif
