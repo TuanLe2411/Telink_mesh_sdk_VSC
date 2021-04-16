@@ -5,7 +5,17 @@
         "vendor_model.h": "c",
         "app_serial.h": "c",
         "user_ali_time.h": "c",
-        "uart.h": "c"
+        "uart.h": "c",
+        "app_mesh.h": "c",
+        "serial.h": "c",
+        "tutility.h": "c",
+        "tstring.h": "c",
+        "app_gpio_func.h": "c",
+        "xlocale": "c",
+        "xlocnum": "c",
+        "user_fifo.h": "c",
+        "app_sensor_uart.h": "c",
+        "cmd_interface.h": "c"
     },
     "C_Cpp.dimInactiveRegions": false
 }

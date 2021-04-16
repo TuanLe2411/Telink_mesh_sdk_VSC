@@ -25,7 +25,7 @@ LIBS :=  -llt_8258_mesh -lsoft-fp -lsig_mesh_LPN_825x
 TEL_PATH := ../..
 
 # Set Project Name
-PROJECT_NAME := mesh_lcd_node
+PROJECT_NAME := mesh_lpn_node
 
 # 设置下载固件的串口号
 DOWNLOAD_PORT := /dev/ttyUSB0

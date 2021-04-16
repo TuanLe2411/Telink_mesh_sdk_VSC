@@ -34,7 +34,7 @@
 #include "proj_lib/ble/ble_smp.h"
 #include "proj_lib/mesh_crypto/mesh_crypto.h"
 #include "proj_lib/mesh_crypto/mesh_md5.h"
-
+#include "drivers/8258/adc.h"
 #include "proj_lib/sig_mesh/app_mesh.h"
 #include "vendor/common/app_provison.h"
 #include "vendor/common/app_beacon.h"
@@ -45,6 +45,7 @@
 #include "proj_lib/ble/gap.h"
 #include "vendor/common/blt_soft_timer.h"
 #include "proj/drivers/rf_pa.h"
+#include "user_lib/serial.h"
 
 #if (HCI_ACCESS==HCI_USE_UART)
 #include "proj/drivers/uart.h"
@@ -214,8 +215,6 @@ void proc_ui()
 	{
 		return;
 	}
-	tick = clock_time();
-
 	//static u32 A_req_tick;
 	static u8 fri_request_send = 1;
 	if(fri_request_send/* || clock_time_exceed(A_req_tick, 2000*1000)*/){
@@ -292,18 +291,7 @@ void main_loop ()
 	proc_led();
 	
 	mesh_loop_process();
-#if ADC_ENABLE
-	static u32 adc_check_time;
-    if(clock_time_exceed(adc_check_time, 1000*1000)){
-        adc_check_time = clock_time();
-		static u16 T_adc_val;
-		#if(MCU_CORE_TYPE == MCU_CORE_8269)     
-        T_adc_val = adc_BatteryValueGet();
-		#else
-		T_adc_val = adc_sample_and_get_result();
-		#endif
-    }  
-#endif	
+
 	#if PTS_TEST_EN
 	pts_test_case_lpn();
 	#endif

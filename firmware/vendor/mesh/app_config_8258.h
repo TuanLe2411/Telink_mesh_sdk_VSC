@@ -83,19 +83,13 @@ extern "C" {
 #define HCI_USE_UART	1
 #define HCI_USE_USB		2
 
-#ifndef HCI_ACCESS
-#if (WIN32 || PTS_TEST_EN)
-#define HCI_ACCESS		HCI_USE_USB
-#elif MESH_MONITOR_EN
+
 #define HCI_ACCESS		HCI_USE_UART
-#else
-#define HCI_ACCESS		HCI_USE_NONE
-#endif 
+
 
 #if (HCI_ACCESS==HCI_USE_UART)
-#define UART_TX_PIN		UART_TX_PB1
-#define UART_RX_PIN		UART_RX_PB0
-#endif
+#define UART_TX_PIN		UART_TX_PD7
+#define UART_RX_PIN		UART_RX_PA0
 #endif
 
 #ifndef HCI_LOG_FW_EN

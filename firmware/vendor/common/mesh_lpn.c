@@ -36,6 +36,9 @@
 #include "mesh_common.h"
 #include "vendor/common/app_heartbeat.h"
 #include "blt_soft_timer.h"
+
+#include "user_lib/serial.h"
+
 #if(HCI_ACCESS == HCI_USE_UART)
 #include "proj/drivers/uart.h"
 #endif
@@ -537,7 +540,6 @@ void mesh_feature_set_lpn(){
     p_req->LPNCounter = 0 - 1;  // increase counter later
     #endif
 }
-
 void mesh_friend_ship_start_poll()
 {
     if(is_in_mesh_friend_st_lpn()){

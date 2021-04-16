@@ -1892,9 +1892,9 @@ void ble_mac_init()
 		tbl_mac[2] = value_rand[2];
 
 		#if(MCU_CORE_TYPE == MCU_CORE_8258)
-			tbl_mac[3] = 0x38;             //company id: 0xA4C138
-			tbl_mac[4] = 0xC1;
-			tbl_mac[5] = 0xA4;
+			tbl_mac[3] = 0xA1;             //company id: 0xA4C138
+			tbl_mac[4] = 0xA1;
+			tbl_mac[5] = 0xA1;
 		#elif(MCU_CORE_TYPE == MCU_CORE_8278)
 			tbl_mac[3] = 0xD1;             //company id: 0xC119D1
 			tbl_mac[4] = 0x19;
@@ -2830,7 +2830,11 @@ void uart_drv_init()
 
 	//baud rate: 115200
 	#if (CLOCK_SYS_CLOCK_HZ == 16000000)
-		uart_init(9, 13, PARITY_NONE, STOP_BIT_ONE);
+		#if (__PROJECT_NODE_SENSOR_NO_LPN__)
+			uart_init(118, 13, PARITY_NONE, STOP_BIT_ONE);
+		#else
+			uart_init(9, 13, PARITY_NONE, STOP_BIT_ONE);
+		#endif
 	#elif (CLOCK_SYS_CLOCK_HZ == 24000000)
 		uart_init(12, 15, PARITY_NONE, STOP_BIT_ONE);
 	#elif (CLOCK_SYS_CLOCK_HZ == 32000000)

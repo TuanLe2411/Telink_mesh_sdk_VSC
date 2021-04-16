@@ -39,6 +39,8 @@
 			#include "../project/mesh_node_dim/app/app_config_8258.h"
 		#elif (__PROJECT_NODE_LCD__)
 			#include "../project/mesh_node_lcd/app/app_config_8258.h"
+		#elif (__PROJECT_NODE_SENSOR_NO_LPN__)
+			#include "../project/mesh_node_sensor_no_lpn/app/app_config_8258.h"
 		#else
 			#include "../mesh/app_config_8258.h"
 		#endif
