@@ -2971,6 +2971,7 @@ void mesh_pro_rc_adv_dispatch(pro_PB_ADV *p_adv){
 			break;
 		*/
 		case STATE_PRO_COMPLETE:
+		
 			if(p_adv->transBear.bearAck.header.GPCF == TRANS_START &&
 				p_adv->transStart.data[0]== PRO_COMPLETE){
 				// return the test case result 
