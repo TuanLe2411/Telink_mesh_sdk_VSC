@@ -8,7 +8,10 @@
 #include "user_lib/user_fifo.h"
 #include "drivers/8258/timer.h"
 #include "vendor/common/cmd_interface.h"
+
 const char uart_message_header[2] = {0xaa, 0xaa};
+int reset_flag = 0xff;
+u8 current_frame = 0xff;
 
 void module_send_response(void *c, int len){
 	uart_print_data((u8 *)c, len, uart_message_header, 2);
@@ -35,11 +38,11 @@ void module_on_reset(){
 	start_reboot();
 }
 
-void module_send_led_toggle(void *d){
-	uart_data_response *temp = (uart_data_response *)d;
+void module_send_led_control(u8 frame_number, u8 cmd){
 	module_call_chip_wakeup();
-	u8 dt[12] = {0xF5, 0x0A, 0x03, temp->frame_number + 0x10, 0x00, 0x00, 0x03, 0x01, 0x51, 0xAA, 0x00, 0 };
+	u8 dt[12] = {0xF5, 0x0A, 0x03, frame_number, 0x00, 0x00, 0x03, 0x01, 0x51, cmd, 0x00, 0 };
 	dt[11] = create_crc_check(dt);
+	current_frame = current_frame + 0x10;
 	uart_print_data(dt, 12, uart_message_header, 2);
 }
 
@@ -78,8 +81,7 @@ void module_create_response(uart_data_response *uart_res, uart_data_receive *r, 
 
 	// uart_res->crcCheck = (s & 0xff);
 }
-int reset_flag = 0xff;
-u8 current_frame = 0xff;
+
 void module_cmd_handler(uart_data_receive *r){
 	uart_data_response uart_res = {0};
 	switch (r->action)
@@ -101,7 +103,7 @@ void module_cmd_handler(uart_data_receive *r){
 				module_send_response(&uart_res, sizeof(uart_res));
 				if(reset_flag == 0xff){
 					sleep_ms(30);
-					module_send_led_toggle(&uart_res);
+					module_send_led_control(current_frame + 0x10, UART_LED_CONTROL_BLINK);
 					reset_flag = 1;
 				}
 			}
@@ -109,14 +111,20 @@ void module_cmd_handler(uart_data_receive *r){
 			break;
 		case UART_DATA_ACTION_LED_CONTROL:
 			module_create_response(&uart_res, r, UART_DATA_ACTION_LED_CONTROL_ACK);
-			if(current_frame != uart_res.frame_number){
+			if(reset_flag == 1){
 				module_call_chip_wakeup();
 				module_send_response(&uart_res, sizeof(uart_res));
 				current_frame = uart_res.frame_number;
-				if(reset_flag == 1){
-					module_on_reset();
+				module_on_reset();
+				break;
+			}else{
+				if(current_frame != uart_res.frame_number){
+					module_call_chip_wakeup();
+					module_send_response(&uart_res, sizeof(uart_res));
+					current_frame = uart_res.frame_number;
 				}
 			}
+			
 			break;
 		default:
 			break;
@@ -205,4 +213,16 @@ void rx_from_uart_cb(void){
 
 void module_send_message_to_chip(){
 	return;
+}
+
+int is_on_reset(){
+	return reset_flag;
+}
+
+u8 get_current_frame_number(){
+	return current_frame;
+}
+
+void module_control_led_testing(){
+	
 }

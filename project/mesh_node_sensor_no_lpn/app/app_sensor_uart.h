@@ -4,6 +4,9 @@
 #include "proj/common/types.h"
 extern void rx_from_uart_cb(void);
 extern void module_send_message_to_chip();
+extern void module_send_led_control(u8 frame_number, u8 cmd);
+extern int is_on_reset();
+extern u8 get_current_frame_number();
 
 #define UART_DATA_HEADER                   0xaaaa
 #define UART_DATA_DEFAULT_LEN              0x0a
@@ -24,6 +27,10 @@ extern void module_send_message_to_chip();
 #define UART_DATA_ID1                      {0x00, 0x00, 0x03}
 #define UART_DATA_ID2                      0x01
 #define UART_DATA_deviceId                 0x51
+
+#define UART_LED_CONTROL_OFF            0x00
+#define UART_LED_CONTROL_ON             0xff
+#define UART_LED_CONTROL_BLINK          0xaa
 
 typedef struct {
     u8 type;
@@ -60,4 +67,5 @@ typedef struct {
     u8 data1;
     u8 data2;
 }crc_check_input;
+
 #endif
