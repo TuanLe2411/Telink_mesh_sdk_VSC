@@ -38,11 +38,11 @@ void module_on_reset(){
 	start_reboot();
 }
 
-void module_send_led_control(u8 frame_number, u8 cmd){
-	module_call_chip_wakeup();
-	u8 dt[12] = {0xF5, 0x0A, 0x03, frame_number, 0x00, 0x00, 0x03, 0x01, 0x51, cmd, 0x00, 0 };
-	dt[11] = create_crc_check(dt);
+void module_send_led_control(u8 cmd){
 	current_frame = current_frame + 0x10;
+	u8 dt[12] = {0xF5, 0x0A, 0x03, current_frame, 0x00, 0x00, 0x03, 0x01, 0x51, cmd, 0x00, 0 };
+	dt[11] = create_crc_check(dt);
+	module_call_chip_wakeup();
 	uart_print_data(dt, 12, uart_message_header, 2);
 }
 
@@ -70,16 +70,6 @@ void module_create_response(uart_data_response *uart_res, uart_data_receive *r, 
 	crc_check.data2 = uart_res->data2;
 
 	uart_res->crcCheck = create_crc_check((u8 *)&crc_check);
-	// u8 crc_check_para[11];
-	// memcpy(crc_check_para, (u8 *)&crc_check, 11);
-	
-
-	// int s = 0;
-	// for(int i = 0; i <11 ; i++ ){
-	// 	s = s + crc_check_para[i];
-	// }
-
-	// uart_res->crcCheck = (s & 0xff);
 }
 
 void module_cmd_handler(uart_data_receive *r){
@@ -103,33 +93,34 @@ void module_cmd_handler(uart_data_receive *r){
 				module_send_response(&uart_res, sizeof(uart_res));
 				if(reset_flag == 0xff){
 					sleep_ms(30);
-					module_send_led_control(current_frame + 0x10, UART_LED_CONTROL_BLINK);
+					module_send_led_control(UART_LED_CONTROL_BLINK);
 					reset_flag = 1;
 				}
 			}
 			//module_on_reset();
 			break;
 		case UART_DATA_ACTION_LED_CONTROL:
-			 module_create_response(&uart_res, r, UART_DATA_ACTION_LED_CONTROL_ACK);
-			// if(reset_flag == 1){
-			// 	module_call_chip_wakeup();
-			// 	module_send_response(&uart_res, sizeof(uart_res));
-			// 	current_frame = uart_res.frame_number;
-			// 	module_on_reset();
-			// 	break;
-			// }else{
-			// 	if(current_frame != uart_res.frame_number){
-			// 		module_call_chip_wakeup();
-			// 		module_send_response(&uart_res, sizeof(uart_res));
-			// 		current_frame = uart_res.frame_number;
-			// 	}
-			// }
+			module_create_response(&uart_res, r, UART_DATA_ACTION_LED_CONTROL_ACK);
+			if(reset_flag == 1){
 				module_call_chip_wakeup();
 				module_send_response(&uart_res, sizeof(uart_res));
 				current_frame = uart_res.frame_number;
-					if(reset_flag == 1){
-						module_on_reset();
-					}
+				module_on_reset();
+				break;
+			}else{
+				if(current_frame != uart_res.frame_number){
+					module_call_chip_wakeup();
+					module_send_response(&uart_res, sizeof(uart_res));
+					current_frame = uart_res.frame_number;
+				}
+			}
+
+			// module_call_chip_wakeup();
+			// module_send_response(&uart_res, sizeof(uart_res));
+			// current_frame = uart_res.frame_number;
+			// if(reset_flag == 1){
+			// 	module_on_reset();
+			// }
 			break;
 		default:
 			break;
@@ -161,7 +152,7 @@ void uart_data_handler(u8 *para, int len){
 					if((header_t == UART_DATA_HEADER) && (user_fifo_get(user_fifo.r + 5 + data_len) == UART_DATA_TYPE_CHIP_TO_MODULE)){
 						int i = 0;
 						
-						while((user_fifo_get(i) << 8 | user_fifo_get(i+1) != UART_DATA_HEADER)&&( user_fifo_get(i + 2) != UART_DATA_TYPE_CHIP_TO_MODULE)&&(i > 0)){
+						while(((user_fifo_get(i) << 8) | (user_fifo_get(i+1) != UART_DATA_HEADER))&&( user_fifo_get(i + 2) != UART_DATA_TYPE_CHIP_TO_MODULE)&&(i > 0)){
 							p[i] = user_fifo_pop();
 							i++;
 						}
