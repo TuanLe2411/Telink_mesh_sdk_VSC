@@ -1512,7 +1512,7 @@ u8 mesh_sub_search_and_set(u16 op, u16 ele_adr, u16 sub_adr, u8 *uuid, u32 model
 int mesh_cmd_sig_cfg_model_sub_set(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par);
 int mesh_cmd_sig_sig_model_sub_get(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par);
 int mesh_cmd_sig_vendor_model_sub_get(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par);
-
+int user_mesh_cmd_sig_cfg_bind(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par);
 //-------- config model end -------
 enum{
 	EV_TRAVERSAL_SET_MD_ELE_ADR		= 0,

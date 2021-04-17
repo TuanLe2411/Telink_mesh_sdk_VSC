@@ -110,21 +110,26 @@ void module_cmd_handler(uart_data_receive *r){
 			//module_on_reset();
 			break;
 		case UART_DATA_ACTION_LED_CONTROL:
-			module_create_response(&uart_res, r, UART_DATA_ACTION_LED_CONTROL_ACK);
-			if(reset_flag == 1){
+			 module_create_response(&uart_res, r, UART_DATA_ACTION_LED_CONTROL_ACK);
+			// if(reset_flag == 1){
+			// 	module_call_chip_wakeup();
+			// 	module_send_response(&uart_res, sizeof(uart_res));
+			// 	current_frame = uart_res.frame_number;
+			// 	module_on_reset();
+			// 	break;
+			// }else{
+			// 	if(current_frame != uart_res.frame_number){
+			// 		module_call_chip_wakeup();
+			// 		module_send_response(&uart_res, sizeof(uart_res));
+			// 		current_frame = uart_res.frame_number;
+			// 	}
+			// }
 				module_call_chip_wakeup();
 				module_send_response(&uart_res, sizeof(uart_res));
 				current_frame = uart_res.frame_number;
-				module_on_reset();
-				break;
-			}else{
-				if(current_frame != uart_res.frame_number){
-					module_call_chip_wakeup();
-					module_send_response(&uart_res, sizeof(uart_res));
-					current_frame = uart_res.frame_number;
-				}
-			}
-			
+					if(reset_flag == 1){
+						module_on_reset();
+					}
 			break;
 		default:
 			break;
@@ -139,6 +144,9 @@ int is_data_valid(u8 *para, int len){
 }
 
 void uart_data_handler(u8 *para, int len){
+	if(user_fifo.num_bytes_written == MAX_QUEUE_LEN){
+		user_fifo_reset();
+	}
 	for(int i = 0; i< len ; i++){
 		user_fifo_push(para[i]);
 	}
@@ -223,6 +231,14 @@ u8 get_current_frame_number(){
 	return current_frame;
 }
 
-void module_control_led_testing(){
-	
+void module_control_led_off_after_reset(){
+	u8 dt[12] = {0xF5, 0x0A, 0x03, 0, 0x00, 0x00, 0x03, 0x01, 0x51, 0x00, 0x00, 0 };
+	for(int i = 0; i<= 0xf0; i = i + 0x10){
+		current_frame = current_frame + 0x10;
+		dt[3] = current_frame;
+		dt[11] = create_crc_check(dt);
+		uart_print_data(dt, 12, uart_message_header, 2);
+	}
+	sleep_ms(400);
+	user_fifo_reset();
 }

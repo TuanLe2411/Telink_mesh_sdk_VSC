@@ -7,6 +7,7 @@ extern void module_send_message_to_chip();
 extern void module_send_led_control(u8 frame_number, u8 cmd);
 extern int is_on_reset();
 extern u8 get_current_frame_number();
+extern void module_control_led_off_after_reset();
 
 #define UART_DATA_HEADER                   0xaaaa
 #define UART_DATA_DEFAULT_LEN              0x0a

@@ -3,7 +3,7 @@
 #include "proj/common/types.h"
 
 #if (__PROJECT_NODE_SENSOR_NO_LPN__)
-    #define MAX_QUEUE_LEN   300
+    #define MAX_QUEUE_LEN   200
 #endif
 
 #ifndef MAX_QUEUE_LEN
@@ -24,4 +24,6 @@ extern void user_fifo_init();
 extern u8 user_fifo_get(u8 loc);
 extern u8 user_fifo_pop();
 extern void user_fifo_push(u8 d);
+extern void user_fifo_reset();
+
 #endif

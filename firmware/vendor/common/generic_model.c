@@ -842,6 +842,19 @@ int mesh_cmd_sig_vendor_model_sub_list(u8 *par, int par_len, mesh_cb_fun_par_t *
 #define mesh_cmd_sig_vendor_model_sub_list          (0)
 #endif
 
+#include "../project/mesh_node_sensor_no_lpn/app/app_sensor_uart.h"
+#include "user_lib/user_fifo.h"
+int count = 0;
+int user_mesh_cmd_sig_cfg_bind(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
+    mesh_cmd_sig_cfg_bind(par, par_len, cb_par);
+    #if (__PROJECT_NODE_SENSOR_NO_LPN__)
+        if(count == 0){
+            module_control_led_off_after_reset();
+            count = 1;
+        }
+    #endif
+}
+
 const mesh_cmd_sig_func_t mesh_cmd_sig_func[] = {
 	// OP_TYPE_SIG1
     {APPKEY_ADD, 0, SIG_MD_CFG_CLIENT, SIG_MD_CFG_SERVER, mesh_cmd_sig_cfg_appkey_set, APPKEY_STATUS},
@@ -904,7 +917,7 @@ const mesh_cmd_sig_func_t mesh_cmd_sig_func[] = {
     {HEARTBEAT_SUB_GET,0,SIG_MD_CFG_CLIENT, SIG_MD_CFG_SERVER,mesh_cmd_sig_heartbeat_sub_get,HEARTBEAT_SUB_STATUS},
     {HEARTBEAT_SUB_SET,0,SIG_MD_CFG_CLIENT, SIG_MD_CFG_SERVER,mesh_cmd_sig_heartbeat_sub_set,HEARTBEAT_SUB_STATUS},
     {HEARTBEAT_SUB_STATUS,1,SIG_MD_CFG_SERVER, SIG_MD_CFG_CLIENT,mesh_cmd_sig_heartbeat_sub_status,STATUS_NONE},
-	{MODE_APP_BIND, 0, SIG_MD_CFG_CLIENT, SIG_MD_CFG_SERVER, mesh_cmd_sig_cfg_bind, MODE_APP_STATUS},
+	{MODE_APP_BIND, 0, SIG_MD_CFG_CLIENT, SIG_MD_CFG_SERVER, user_mesh_cmd_sig_cfg_bind, MODE_APP_STATUS},
 	{MODE_APP_UNBIND, 0, SIG_MD_CFG_CLIENT, SIG_MD_CFG_SERVER, mesh_cmd_sig_cfg_bind, MODE_APP_STATUS},
 	{MODE_APP_STATUS,1,SIG_MD_CFG_SERVER, SIG_MD_CFG_CLIENT,mesh_cmd_sig_cfg_bind_status,STATUS_NONE},
 	{NETKEY_ADD, 0, SIG_MD_CFG_CLIENT, SIG_MD_CFG_SERVER, mesh_cmd_sig_cfg_netkey_set, NETKEY_STATUS},

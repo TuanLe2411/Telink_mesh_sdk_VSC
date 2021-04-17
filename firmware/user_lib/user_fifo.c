@@ -36,3 +36,7 @@ void user_fifo_push(u8 d){
 u8 user_fifo_get(u8 loc){
     return user_fifo.dt[loc];
 }
+
+void user_fifo_reset(){
+    user_fifo.num_bytes_written = user_fifo.r = user_fifo.w = 0;
+}
