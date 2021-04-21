@@ -40,3 +40,16 @@ u8 user_fifo_get(u8 loc){
 void user_fifo_reset(){
     user_fifo.num_bytes_written = user_fifo.r = user_fifo.w = 0;
 }
+
+u16 user_fifo_get_r_point(){
+    return user_fifo.r;
+}
+
+u16 user_fifo_get_w_point(){
+    return user_fifo.w;
+}
+
+u16 user_fifo_get_number_bytes_written(){
+    return user_fifo.num_bytes_written;
+}
+

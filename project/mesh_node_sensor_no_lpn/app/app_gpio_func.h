@@ -3,5 +3,6 @@
 
 extern void module_wakeup_chip_control_init();
 extern void module_call_chip_wakeup();
+extern void module_on_sleep();
 
 #endif

@@ -8,6 +8,7 @@ OBJS += \
 $(OUT_PATH)/app.o \
 $(OUT_PATH)/app_gpio_func.o \
 $(OUT_PATH)/app_sensor_uart.o \
+$(OUT_PATH)/app_sensor_model.o \
 $(OUT_PATH)/app_att.o \
 $(OUT_PATH)/main.o
 

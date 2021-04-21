@@ -843,7 +843,6 @@ int mesh_cmd_sig_vendor_model_sub_list(u8 *par, int par_len, mesh_cb_fun_par_t *
 #endif
 
 #include "../project/mesh_node_sensor_no_lpn/app/app_sensor_uart.h"
-#include "user_lib/user_fifo.h"
 int count = 0;
 int user_mesh_cmd_sig_cfg_bind(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
     mesh_cmd_sig_cfg_bind(par, par_len, cb_par);

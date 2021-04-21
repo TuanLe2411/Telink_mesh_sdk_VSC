@@ -26,10 +26,12 @@
 #include "proj_lib/ble/l2cap.h"
 #include "proj_lib/ble/ble_common.h"
 #include "drivers/8258/gpio.h"
-#include "user_lib/serial.h"
 
+#include "user_lib/user_fifo.h"
+#include "user_lib/serial.h"
 #include "app_gpio_func.h"
 #include "app_sensor_uart.h"
+#include "app_sensor_model.h"
 #if MI_API_ENABLE
 #include "mesh/mi_api/telink_sdk_mible_api.h"
 #include "mesh/mi_api/certi/mijia_profiles/mi_service_server.h"
@@ -332,6 +334,27 @@ void test_simu_io_user_define_proc()
 }
 #endif
 
+void normal_wake_up(){
+	static u32 normal_wakeup_time;
+	if((clock_time_exceed(normal_wakeup_time, 500*1000)) && (get_provision_state() == STATE_DEV_PROVED) && (get_bind_state() == 0)){
+		normal_wakeup_time = clock_time();
+		module_on_sleep();
+	}
+}
+
+void provision_wake_up(){
+	static u32 wakeup_time = 0;
+	if(clock_time_exceed(wakeup_time, 40*1000*1000)){
+		wakeup_time = clock_time();
+		if(get_bind_state() == 1){
+			sensor_update_type_device();
+			sleep_us(100000);
+		}
+		set_bind_state(0);
+		module_on_sleep();
+	}
+}
+
 
 void main_loop(){
     static u32 tick_loop;
@@ -358,6 +381,8 @@ void main_loop(){
     proc_led();
 	
 	mesh_loop_process();
+	normal_wake_up();
+	provision_wake_up();
 	#if MI_API_ENABLE
 		telink_gatt_event_loop();
 		ev_main();
@@ -582,7 +607,8 @@ void user_init()
 	#endif
 
 	module_wakeup_chip_control_init();
-	user_fifo_init();
+    user_fifo_init();
+    init_bind_state();
 }
 
 #if (PM_DEEPSLEEP_RETENTION_ENABLE)
@@ -617,6 +643,7 @@ _attribute_ram_code_ void user_init_deepRetn(void)
     // should enable IRQ here, because it may use irq here, for example BLE connect.
     // irq_enable();
 	module_wakeup_chip_control_init();
-	user_fifo_init();
+    user_fifo_init();
+    init_bind_state();
 }
 #endif

@@ -8,6 +8,9 @@ extern void module_send_led_control(u8 cmd);
 extern int is_on_reset();
 extern u8 get_current_frame_number();
 extern void module_control_led_off_after_reset();
+extern int get_bind_state();
+extern void set_bind_state(int st);
+extern void init_bind_state();
 
 #define UART_DATA_HEADER                   0xaaaa
 #define UART_DATA_DEFAULT_LEN              0x0a
@@ -16,8 +19,8 @@ extern void module_control_led_off_after_reset();
 #define UART_DATA_TYPE_MODULE_TO_CHIP      0xf5
 #define UART_DATA_TYPE_CHIP_TO_MODULE      0xfa
 
-#define UART_DATA_ACTION_BTN_ONCLICK       0x01
-#define UART_DATA_ACTION_BTN_ONCLICK_ACK   0x01
+#define UART_DATA_ACTION_DETECTED       0x01
+#define UART_DATA_ACTION_DETECTED_ACK   0x01
 
 #define UART_DATA_ACTION_ON_RESET          0x02
 #define UART_DATA_ACTION_ON_RESET_ACK      0x02

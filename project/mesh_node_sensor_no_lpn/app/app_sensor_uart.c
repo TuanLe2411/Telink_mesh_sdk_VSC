@@ -8,10 +8,13 @@
 #include "user_lib/user_fifo.h"
 #include "drivers/8258/timer.h"
 #include "vendor/common/cmd_interface.h"
-
+#include "app_sensor_model.h"
 const char uart_message_header[2] = {0xaa, 0xaa};
+
 int reset_flag = 0xff;
 u8 current_frame = 0xff;
+int bind_state;
+
 
 void module_send_response(void *c, int len){
 	uart_print_data((u8 *)c, len, uart_message_header, 2);
@@ -46,6 +49,15 @@ void module_send_led_control(u8 cmd){
 	uart_print_data(dt, 12, uart_message_header, 2);
 }
 
+void module_on_detec_send_mesh_mes(uart_data_response *d){
+	if(d->data1 == SENSOR_DETECTED){
+		sensor_on_detected_report();
+	}else{
+		sensor_no_detected_report();
+	}
+	return;
+}
+
 void module_create_response(uart_data_response *uart_res, uart_data_receive *r, u8 act){
 	uart_res->type = UART_DATA_TYPE_MODULE_TO_CHIP;
 	uart_res->len = UART_DATA_DEFAULT_LEN;
@@ -70,20 +82,24 @@ void module_create_response(uart_data_response *uart_res, uart_data_receive *r, 
 	crc_check.data2 = uart_res->data2;
 
 	uart_res->crcCheck = create_crc_check((u8 *)&crc_check);
+	//module_on_detec_send_mesh_mes(uart_res);
 }
+
+
 
 void module_cmd_handler(uart_data_receive *r){
 	uart_data_response uart_res = {0};
 	switch (r->action)
 	{
-		case UART_DATA_ACTION_BTN_ONCLICK:
-			module_create_response(&uart_res, r, UART_DATA_ACTION_BTN_ONCLICK_ACK);
+		case UART_DATA_ACTION_DETECTED:
+			module_create_response(&uart_res, r, UART_DATA_ACTION_DETECTED_ACK);
 			if(current_frame != uart_res.frame_number){
 				module_call_chip_wakeup();
 				module_send_response(&uart_res, sizeof(uart_res));
 				current_frame = uart_res.frame_number;
+				module_on_detec_send_mesh_mes(&uart_res);
 			}
-		
+
 			break;
 		
 		case UART_DATA_ACTION_ON_RESET:
@@ -128,11 +144,108 @@ void module_cmd_handler(uart_data_receive *r){
 	return;
 }
 
+int is_data_on_valid(u8 *para, int len){
+	u16 header = para[0] << 8 | para[1];
+	u8 type = para[2];
+	u8 data_len = para[3];
+	if((header == UART_DATA_HEADER) && (type == UART_DATA_TYPE_CHIP_TO_MODULE) && (data_len == len - 4) && (para[len - 1] == message_crc_check(para)) ){
+		return 0;
+	}
+	return -1;
+}
 
+// int is_data_on_receiving_valid(u8 *para, int len){
+// 	return is_data_on_valid(para, len);
+// }
 
-int is_data_valid(u8 *para, int len){
+int add_data_invalid_to_queue(u8 *p, int len){
+	for(int i = 0; i< len ; i++){
+		user_fifo_push(p[i]);
+	}
 	return 0;
 }
+
+u16 find_next_uart_mess_head_point(){
+	u16 count = 0;
+	u16 i = 0;
+	u16 r_point = user_fifo_get_r_point();
+	while (count <= user_fifo_get_number_bytes_written())
+	{
+		u16 i1 = ((i + r_point) > (MAX_QUEUE_LEN - 1))?(i + r_point) : (i + r_point - MAX_QUEUE_LEN);
+		u16 i2 = ((i + r_point + 1) > (MAX_QUEUE_LEN - 1))?(i + r_point + 1) : (i + r_point + 1 - MAX_QUEUE_LEN);
+		u16 i3 = ((i + r_point + 2) > (MAX_QUEUE_LEN - 1))?(i + r_point + 2) : (i + r_point + 2 - MAX_QUEUE_LEN);
+		if((user_fifo_get(i1) << 8 | user_fifo_get(i2) != UART_DATA_HEADER) && (user_fifo_get(i3) != UART_DATA_TYPE_CHIP_TO_MODULE)){
+			return i1;
+		}
+		i = i + 1;
+		count = count + 1;
+		if(i = MAX_QUEUE_LEN){
+			i = 0;
+		}
+	}
+	return -1;
+}
+
+int find_data_valid_in_queue(u8 *buff, int *len){
+	while(1){
+		u16 i = find_next_uart_mess_head_point();
+		if(i < 0){
+			return;
+		}
+		u16 data_lenght = 0;
+		for(int j = 0; j< i; j++){
+			buff[j] = user_fifo_pop();
+			data_lenght = data_lenght + 1;
+		}
+		if(is_data_on_valid(buff, data_lenght)){
+			*len = data_lenght;
+			return 0;
+		}
+	}
+	return -1;
+}
+
+int valid_data_handler(u8 *p, int len){
+	uart_data_receive uart_data_reiv = {0};
+	uart_data_reiv.header = (p[0] << 8) | p[1];
+	uart_data_reiv.type = p[2];
+	uart_data_reiv.action = p[4];
+	uart_data_reiv.frame_number = p[5];
+	uart_data_reiv.data1 = p[11];
+	uart_data_reiv.data2 = p[12];
+	uart_data_reiv.data_explaned_len = p[3] - UART_DATA_DEFAULT_LEN;
+	memcpy(uart_data_reiv.data_explanded, p + 13, uart_data_reiv.data_explaned_len);
+	module_cmd_handler(&uart_data_reiv);
+	return 0;
+}
+
+
+// void uart_data_handler(u8 *para, int len){
+// 	if(user_fifo.num_bytes_written == MAX_QUEUE_LEN){
+// 		user_fifo_reset();
+// 	}
+
+// 	int is_data_on_receiving_valid = is_data_on_valid(para, len);
+// 	if(is_data_on_receiving_valid == 0){
+// 		valid_data_handler(para, len);
+// 		user_fifo_reset();
+// 		return;
+// 	}
+
+// 	for(int i = 0; i< len ; i++){
+// 		user_fifo_push(para[i]);
+// 	}
+
+// 	u8 buff[UART_MAX_LEN];	
+// 	int buff_len;
+// 	int find_data_success = find_data_valid_in_queue(buff, &buff_len);
+// 	if(find_data_success == 0){
+// 		valid_data_handler(buff, buff_len);
+// 		user_fifo_reset();
+// 	}
+
+// 	return;
+// }
 
 void uart_data_handler(u8 *para, int len){
 	if(user_fifo.num_bytes_written == MAX_QUEUE_LEN){
@@ -233,3 +346,19 @@ void module_control_led_off_after_reset(){
 	sleep_ms(400);
 	user_fifo_reset();
 }
+
+int get_bind_state(){
+	return bind_state;
+}
+
+void set_bind_state(int st){
+	bind_state = st;
+}
+
+void init_bind_state(){
+	if(get_provision_state() == STATE_DEV_PROVED){
+		bind_state = 0;
+	}
+	bind_state = 1;
+}
+
