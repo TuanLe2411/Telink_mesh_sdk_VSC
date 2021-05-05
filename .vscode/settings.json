@@ -17,7 +17,9 @@
         "app_sensor_uart.h": "c",
         "cmd_interface.h": "c",
         "xiosbase": "c",
-        "app_lcd_handler.h": "c"
+        "app_lcd_handler.h": "c",
+        "app_sensor_model.h": "c",
+        "user_flash.h": "c"
     },
     "C_Cpp.dimInactiveRegions": false
 }

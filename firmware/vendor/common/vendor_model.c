@@ -49,7 +49,7 @@ model_vendor_btn_scene_t 	model_vd_btn_scene;
 	#define BTN_ACTION_SUCCESS			0
 	#define BTN_ACTION_FAILURE			-1	
 
-	#define GATEWAY_FLASH_ADDRESS		29500
+	#define GATEWAY_FLASH_ADDRESS		0x29500
 
 	#define GW_SET_TD					0x0001
 	#define GW_SV_GW_AD					0x0002
@@ -58,6 +58,12 @@ model_vendor_btn_scene_t 	model_vd_btn_scene;
 	#define DV_SET_TD					0x0001
 	#define DV_SV_GW_AD					0x0002
 	#define DV_RES_TD					0x0003
+
+	#if(__PROJECT_NODE_SMOKE_SENSOR__)
+	#define DV_TYPE_SMOKE_SENSOR		0x03
+	#define DV_FEATURE_SMOKE_SENSOR		0x03
+	#define DV_APP_SMOKE_SENSOR		0x01
+	#endif
 
 //-----------BTN_SCENE_END
 
@@ -233,31 +239,33 @@ int cb_vd_btn_scene_set(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
 #endif
 //---------------
 
-int RD_Messenger_Process_Type_Device(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
-	type_dev_rec *td = (type_dev_rec *)par;
-	type_dev_rec t = {0};
-	switch (td->header)
-	{
-	case 0x0002:
-		flash_erase_sector(GATEWAY_FLASH_ADDRESS);
-		// u8 add[2] = {}
-		// flash_write_page();
-		SendOpParaDebug(cb_par->adr_src, 0, 0xE1, (u8 *)td, sizeof(td));
-		break;
-	case 0x0001:
-		break;
-	case 0x0003:
-		t.header = 0x0003;
-		t.type = 0x03;
-		t.feature = 0x03;
-		t.app = 0x01;
-		SendOpParaDebug(cb_par->adr_src, 0, 0xE1, (u8 *)&t, sizeof(t));
-		break;
-	default:
-		break;
-	}
-	return 0;
-}
+// int RD_Messenger_Process_Type_Device(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
+// 	type_dev_rec *td = (type_dev_rec *)par;
+// 	type_dev_rec t = {0};
+// 	switch (td->header)
+// 	{
+// 	case 0x0002:
+// 		flash_erase_sector(GATEWAY_FLASH_ADDRESS);
+// 		// u8 add[2] = {}
+// 		// flash_write_page();
+// 		SendOpParaDebug(cb_par->adr_src, 0, 0xE1, (u8 *)td, sizeof(td));
+// 		break;
+// 	case 0x0001:
+// 		break;
+// 	case 0x0003:
+// 		t.header = 0x0003;
+// 		t.type = 0x03;
+// 		t.feature = 0x03;
+// 		t.app = 0x01;
+// 		SendOpParaDebug(cb_par->adr_src, 0, 0xE1, (u8 *)&t, sizeof(t));
+// 		break;
+// 	default:
+// 		break;
+// 	}
+// 	return 0;
+// }
+
+
 
 // --------- vendor LPN GATT ota mode set  --------
 #if FEATURE_LOWPOWER_EN
@@ -645,7 +653,6 @@ int cb_vd_msg_attr_upd_time_rsp(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par)
 #define cb_vd_msg_attr_set          (0)
 #define cb_vd_msg_attr_confirm      (0)
 
-#define RD_Messenger_Process_Type_Device	(0)
 #define cb_vd_btn_scene_set			(0)
 
 #if ALI_MD_TIME_EN
@@ -683,19 +690,12 @@ int cb_vd_btn_scene_sts(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
     return err;
 }
 
-int RD_Messenger_Process_Null(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
-	int err = 0;
-    if(cb_par->model){  // model may be Null for status message
-        //model_client_common_t *p_model = (model_client_common_t *)(cb_par->model);
-    }
-    return err;
-}
+
 
 //-----------BTN_SCENE_END
 #else
 #define cb_vd_group_g_status            (0)
 #define cb_vd_msg_attr_status           (0)
-#define RD_Messenger_Process_Null		(0)
 #define cb_vd_btn_scene_sts				(0)
 #endif
 
@@ -1004,6 +1004,81 @@ int cb_vd_trans_time_sts(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par)
 #if !WIN32
 const 
 #endif
+typedef struct {
+	u16 header;
+	u8 type;
+	u8 feature;
+	u8 app;
+}mess_type_dev_rceiv;
+
+typedef struct {
+	u16 header;
+	u8 type;
+	u8 feature;
+	u8 app;
+}mess_type_dev_rponse;
+
+void write_gw_add_to_flash(u16 addr){
+	u8 buf[2] = {addr >> 8, addr & 0x0f};
+	flash_erase_sector(GATEWAY_FLASH_ADDRESS);
+	flash_write_page(GATEWAY_FLASH_ADDRESS, sizeof(buf), buf);
+	return;
+}
+
+void module_response_type_dv_to_gw(mess_type_dev_rceiv *rceiv, mesh_cb_fun_par_t *cb_par){
+	mess_type_dev_rponse t = {0};
+	switch (rceiv->header)
+	{
+	case GW_SV_GW_AD:
+		t.header = DV_SV_GW_AD;
+		SendOpParaDebug(cb_par->adr_src, 0, 0xE1, (u8 *)&t, sizeof(t));
+		break;
+	case GW_SET_TD:
+		break;
+	case GW_RES_TD:
+	#if (__PROJECT_NODE_SMOKE_SENSOR__)
+		t.header = DV_RES_TD;
+		t.type = DV_TYPE_SMOKE_SENSOR;
+		t.feature = DV_FEATURE_SMOKE_SENSOR;
+		t.app = DV_APP_SMOKE_SENSOR;
+	#endif
+		SendOpParaDebug(cb_par->adr_src, 0, 0xE1, (u8 *)&t, sizeof(t));
+		break;
+	default:
+		break;
+	}
+	return;
+}
+
+
+int RD_Messenger_Process_Type_Device(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
+	mess_type_dev_rceiv *rceiv = (mess_type_dev_rceiv *)par;
+	switch (rceiv->header)
+	{
+	case GW_SV_GW_AD:
+		write_gw_add_to_flash(cb_par->adr_src);
+		module_response_type_dv_to_gw(rceiv, cb_par);
+		break;
+	case GW_SET_TD:
+		module_response_type_dv_to_gw(rceiv, cb_par);
+		break;
+	case GW_RES_TD:
+		module_response_type_dv_to_gw(rceiv, cb_par);
+		break;
+	default:
+		break;
+	}
+	return 0;
+}
+
+int RD_Messenger_Process_Null(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
+	int err = 0;
+    if(cb_par->model){  // model may be Null for status message
+        //model_client_common_t *p_model = (model_client_common_t *)(cb_par->model);
+    }
+    return err;
+}
+
 #if __PROJECT_NODE_SENSOR_NO_LPN__
 #include "../project/mesh_node_sensor_no_lpn/app/app_sensor_model.h"
 typedef struct{

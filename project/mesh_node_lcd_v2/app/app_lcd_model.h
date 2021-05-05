@@ -6,7 +6,6 @@
 #define REMOTE_AC_MODULE_TYPE              0x0003
 
 #define VENDOR_LCD_SEND_BTN_ONCLICK        0x52
-#define GATEWAY_ADDR                       0x0001
 
 typedef struct btn_onclick_data_status{
     u16 header;

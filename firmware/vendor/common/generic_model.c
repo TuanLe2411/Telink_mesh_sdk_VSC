@@ -852,6 +852,7 @@ int user_mesh_cmd_sig_cfg_bind(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
             count = 1;
         }
     #endif
+    return 0;
 }
 
 const mesh_cmd_sig_func_t mesh_cmd_sig_func[] = {

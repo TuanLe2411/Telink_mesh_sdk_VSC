@@ -96,7 +96,7 @@ void uart_handler_data_in_main_loop(u8 *para, int len){
 		}
 		uart_handler_by_act(para, len);
 	}
-	return 0;
+	return;
 }
 
 // int uart_lcd_handler_data_t(u8 *para, int len){

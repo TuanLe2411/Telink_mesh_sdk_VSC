@@ -5,6 +5,16 @@
 #include "vendor/common/cmd_interface.h"
 #include "app_serial.h"
 #include "vendor/common/scene.h"
+#include "user_lib/serial.h"
+#include "drivers/8258/flash.h"
+
+#define GW_ADDR_SAVE 0x29500
+
+u16 get_gw_addr(){
+   u8 buf[2];
+   flash_read_page(GW_ADDR_SAVE, 2, buf);
+   return buf[0] << 8 | buf[1]; 
+}
 
 u16 find_sceneId_from_btn_onclick(u8 btn_onclick, u8 btn_mode){
     for(int i = 0; i< MAX_SCENE_SAVE; i++){
@@ -33,10 +43,12 @@ void module_send_btn_onclick_to_hc(u8 btn_onclick, u8 btn_mode, u16 sceneId, u16
     btn_onclick_status.mid = btn_mode;
     btn_onclick_status.sceneId = sceneId;
     btn_onclick_status.appId = appId;
+
+    u16 gw_addr = get_gw_addr();
     #if 1
         SendOpParaDebug(ADR_ALL_NODES, 0, VENDOR_LCD_SEND_BTN_ONCLICK, (u8 *)&btn_onclick_status, sizeof(btn_onclick_status));
     #else
-        SendOpParaDebug(GATEWAY_ADDR, 0, VENDOR_LCD_SEND_BTN_ONCLICK, (u8 *)&btn_onclick_status, sizeof(btn_onclick_status));
+        SendOpParaDebug(gw_addr, 0, VENDOR_LCD_SEND_BTN_ONCLICK, (u8 *)&btn_onclick_status, sizeof(btn_onclick_status));
     #endif
     return;
 }
