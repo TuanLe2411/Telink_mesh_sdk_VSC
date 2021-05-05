@@ -10,7 +10,7 @@ extern u8 get_current_frame_number();
 extern void module_control_led_off_after_reset();
 extern int get_bind_state();
 extern void set_bind_state(int st);
-extern void init_bind_state();
+extern void init_all_para();
 
 #define UART_DATA_HEADER                   0xaaaa
 #define UART_DATA_DEFAULT_LEN              0x0a

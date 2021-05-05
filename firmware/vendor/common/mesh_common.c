@@ -204,7 +204,7 @@ MYFIFO_INIT(hci_tx_fifo, HCI_TX_FIFO_SIZE, HCI_TX_FIFO_NUM); // include adv pkt 
 	#define UART_DATA_SIZE              (MESH_LONG_PACKET_EN ? 280 : 24)    // increase or decrease 16bytes for each step.
 	#define HCI_RX_FIFO_SIZE            (UART_DATA_SIZE + 4 + 4)    // 4: sizeof DMA len;  4: margin reserve(can't reveive valid data, because UART_DATA_SIZE is max value of DMA len)
 	STATIC_ASSERT(HCI_RX_FIFO_SIZE % 16 == 0);
-	MYFIFO_INIT(hci_rx_fifo, HCI_RX_FIFO_SIZE, 4);
+	MYFIFO_INIT(hci_rx_fifo, HCI_RX_FIFO_SIZE, 8);
 #else
 	#define UART_DATA_SIZE              (MESH_LONG_PACKET_EN ? 280 : 72)    // increase or decrease 16bytes for each step.
 	#define HCI_RX_FIFO_SIZE            (UART_DATA_SIZE + 4 + 4)    // 4: sizeof DMA len;  4: margin reserve(can't reveive valid data, because UART_DATA_SIZE is max value of DMA len)

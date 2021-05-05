@@ -28,6 +28,8 @@
 
 #include "app_serial.h"
 #include "app_lcd_handler.h"
+#include "user_lib/serial.h"
+#include "user_lib/user_fifo.h"
 #if MI_API_ENABLE
 #include "mesh/mi_api/telink_sdk_mible_api.h"
 #include "mesh/mi_api/certi/mijia_profiles/mi_service_server.h"
@@ -330,6 +332,58 @@ void test_simu_io_user_define_proc()
 }
 #endif
 
+
+void user_fifo_handler(){
+	u16 n = user_fifo_get_number_bytes_written();
+	u16 r = user_fifo_get_r_point();
+	if(n < UART_MIN_LEN){
+		return;
+	}
+	u16 i = find_first_valid_uart_mess_header();
+	if((i == 0) && (n >= UART_MIN_LEN)){
+		u8 buff[UART_MAX_LEN];
+		for(int j = 0; j< n; j++){
+			buff[j] = user_fifo_get(r + j);
+		}
+		if(is_uart_data_reiv_valid(buff, n)){
+			for(int j = 0; j< n; j++){
+				buff[j] = user_fifo_pop();
+			}
+			uart_handler_data_in_main_loop(buff, n);
+		}
+		return;
+	}
+	if (i != 0){
+		u8 buff[UART_MAX_LEN];
+		for(int j = 0; j< i; j++){
+			buff[j] = user_fifo_pop();
+		}
+		if(is_uart_data_reiv_valid(buff, i)){
+			uart_handler_data_in_main_loop(buff, i);
+		}
+		return;
+	}
+}
+
+void check_and_resend_mess(){
+	if(!is_uart_mess_response_waiting()){
+		return;
+	}
+	static u32 check_time;
+	if(clock_time_exceed_ms(check_time, 150)){
+		check_time = clock_time();
+		if(is_uart_mess_response_waiting()){
+			uart_print_data(uart_last_mess_sent.dt, uart_last_mess_sent.len, 0, 0);
+			uart_last_mess_sent.count = uart_last_mess_sent.count + 1;
+			if(uart_last_mess_sent.count > 5){
+				uart_last_mess_sent.flag = 0;
+				uart_last_mess_sent.count = 0;
+			}
+		}
+	}
+}
+
+
 void main_loop(){
     static u32 tick_loop;
 	tick_loop ++;
@@ -351,9 +405,10 @@ void main_loop(){
     blt_sdk_main_loop ();
 
     //UI entry
-    proc_ui();
-    proc_led();
-
+    // proc_ui();
+    // proc_led();
+	check_and_resend_mess();
+	user_fifo_handler();
     mesh_loop_process();
 	#if MI_API_ENABLE
 		telink_gatt_event_loop();
@@ -577,8 +632,6 @@ void user_init()
 		blt_soft_timer_init();
 		//blt_soft_timer_add(&soft_timer_test0, 200*1000);
 	#endif
-
-	
 }
 
 #if (PM_DEEPSLEEP_RETENTION_ENABLE)
@@ -612,6 +665,5 @@ _attribute_ram_code_ void user_init_deepRetn(void)
 #endif
     // should enable IRQ here, because it may use irq here, for example BLE connect.
     // irq_enable();
-
 }
 #endif

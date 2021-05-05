@@ -565,7 +565,7 @@ extern "C" {
     #else
 #define MD_POWER_ONOFF_EN           MD_DEF_TRANSIT_TIME_EN 	// because both of them save in same flash sector.
     #endif
-#if (__PROJECT_NODE_DIM__ || __PROJECT_NODE_LCD__)
+#if (__PROJECT_NODE_DIM__ || __PROJECT_NODE_LCD__ || __PROJECT_NODE_LCD_V2__)
     #define MD_TIME_EN                  1
     #define MD_SCENE_EN                 1
     #define MD_SCHEDULE_EN              MD_TIME_EN  // because both of them save in same flash sector.

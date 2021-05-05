@@ -41,7 +41,7 @@ void user_fifo_reset(){
     user_fifo.num_bytes_written = user_fifo.r = user_fifo.w = 0;
 }
 
-u16 user_fifo_get_r_point(){
+u8 user_fifo_get_r_point(){
     return user_fifo.r;
 }
 

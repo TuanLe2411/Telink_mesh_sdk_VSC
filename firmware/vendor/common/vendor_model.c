@@ -48,7 +48,25 @@ model_vendor_btn_scene_t 	model_vd_btn_scene;
 	//--------------BTN_ACTION_STATE
 	#define BTN_ACTION_SUCCESS			0
 	#define BTN_ACTION_FAILURE			-1	
+
+	#define GATEWAY_FLASH_ADDRESS		29500
+
+	#define GW_SET_TD					0x0001
+	#define GW_SV_GW_AD					0x0002
+	#define GW_RES_TD					0x0003
+
+	#define DV_SET_TD					0x0001
+	#define DV_SV_GW_AD					0x0002
+	#define DV_RES_TD					0x0003
+
 //-----------BTN_SCENE_END
+
+typedef struct {
+	u16 header;
+	u8 type;
+	u8 feature;
+	u8 app;
+}type_dev_rec;
 
 #if (DUAL_VENDOR_EN)
 STATIC_ASSERT((VENDOR_MD_LIGHT_S && 0xffff) != VENDOR_ID_MI);
@@ -190,14 +208,14 @@ int is_btn_scene_set_data_valid(model_btn_scene_receive_t* btn_set){
 int cb_vd_btn_scene_set(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
 	model_btn_scene_receive_t* btn_set = (model_btn_scene_receive_t *)par;
 	if(!is_btn_scene_set_data_valid(btn_set)){
-		return;
+		return 0;
 	}
 	static u8 wn = 0;
 	if(wn == 0){
 		wn = get_current_written_btn_scene_location();
 	}
 	if(wn >= MAX_SCENE_SAVE){
-		return;
+		return 0;
 	}
 	switch (btn_set->header)
 	{
@@ -210,12 +228,34 @@ int cb_vd_btn_scene_set(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
 		default:
 			break;
 	}
-	return 0;
+	return 1;
 }
 #endif
-//---------------BTN_SCENE_END
+//---------------
 
 int RD_Messenger_Process_Type_Device(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
+	type_dev_rec *td = (type_dev_rec *)par;
+	type_dev_rec t = {0};
+	switch (td->header)
+	{
+	case 0x0002:
+		flash_erase_sector(GATEWAY_FLASH_ADDRESS);
+		// u8 add[2] = {}
+		// flash_write_page();
+		SendOpParaDebug(cb_par->adr_src, 0, 0xE1, (u8 *)td, sizeof(td));
+		break;
+	case 0x0001:
+		break;
+	case 0x0003:
+		t.header = 0x0003;
+		t.type = 0x03;
+		t.feature = 0x03;
+		t.app = 0x01;
+		SendOpParaDebug(cb_par->adr_src, 0, 0xE1, (u8 *)&t, sizeof(t));
+		break;
+	default:
+		break;
+	}
 	return 0;
 }
 
@@ -964,6 +1004,29 @@ int cb_vd_trans_time_sts(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par)
 #if !WIN32
 const 
 #endif
+#if __PROJECT_NODE_SENSOR_NO_LPN__
+#include "../project/mesh_node_sensor_no_lpn/app/app_sensor_model.h"
+typedef struct{
+	u16 header;
+	u8 data;
+}gw_res;
+
+int cb_gw_res_st(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
+	gw_res *res = (gw_res *)par;
+	switch (res->header)
+	{
+	case 0x0008:
+		if(res->data == 0x01){
+			set_gw_res_glag(0);
+		}	
+		break;
+	
+	default:
+		break;
+	}
+}
+#endif
+
 mesh_cmd_sig_func_t mesh_cmd_vd_func[] = {
 #if (VENDOR_OP_MODE_SEL == VENDOR_OP_MODE_SPIRIT)
     #if 0 // DEBUG_VENDOR_CMD_EN // just for sample, default disable, 
@@ -1032,6 +1095,9 @@ mesh_cmd_sig_func_t mesh_cmd_vd_func[] = {
 #endif
 	{RD_OPCODE_TYPE_DEVICE_SEND,0,VENDOR_MD_LIGHT_C,VENDOR_MD_LIGHT_S,RD_Messenger_Process_Type_Device,RD_OPCODE_TYPE_DEVICE_RSP},
     {RD_OPCODE_TYPE_DEVICE_RSP,1,VENDOR_MD_LIGHT_S,VENDOR_MD_LIGHT_C,RD_Messenger_Process_Null,STATUS_NONE},
+	#if __PROJECT_NODE_SENSOR_NO_LPN__
+	{VD_BTN_SCENE_SET, 0, VENDOR_MD_LIGHT_C, VENDOR_MD_LIGHT_S, cb_gw_res_st, VD_BTN_SCENE_STATUS},
+	#endif 
     USER_MESH_CMD_VD_ARRAY
 };
 

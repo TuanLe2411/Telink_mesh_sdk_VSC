@@ -33,8 +33,17 @@ typedef struct {
     u8 app;
 }sensor_type_device;
 
+typedef struct {
+    u8 gw_res_flag;
+    void *p;
+}gw_res_check;
+
 extern void sensor_on_detected_report();
 extern void sensor_no_detected_report();
 extern void sensor_update_type_device();
+extern u8 get_gw_res_flag();
+void set_gw_res_glag(u8 f);
+extern u8 get_module_res_st();
+extern void set_module_res_st(u8 f);
 
 #endif

@@ -336,9 +336,16 @@ void test_simu_io_user_define_proc()
 
 void normal_wake_up(){
 	static u32 normal_wakeup_time;
-	if((clock_time_exceed(normal_wakeup_time, 500*1000)) && (get_provision_state() == STATE_DEV_PROVED) && (get_bind_state() == 0)){
+	if((clock_time_exceed(normal_wakeup_time, 2000*1000)) && (get_provision_state() == STATE_DEV_PROVED) && (get_bind_state() == 0)){
 		normal_wakeup_time = clock_time();
-		module_on_sleep();
+		if(get_gw_res_flag() == 1){
+			if(get_module_res_st() == 1){
+				sensor_on_detected_report();
+			}else{
+				sensor_no_detected_report();
+			}
+		}
+		//module_on_sleep();
 	}
 }
 
@@ -348,10 +355,9 @@ void provision_wake_up(){
 		wakeup_time = clock_time();
 		if(get_bind_state() == 1){
 			sensor_update_type_device();
-			sleep_us(100000);
 		}
 		set_bind_state(0);
-		module_on_sleep();
+		//module_on_sleep();
 	}
 }
 
@@ -608,7 +614,7 @@ void user_init()
 
 	module_wakeup_chip_control_init();
     user_fifo_init();
-    init_bind_state();
+    init_all_para();
 }
 
 #if (PM_DEEPSLEEP_RETENTION_ENABLE)
@@ -644,6 +650,6 @@ _attribute_ram_code_ void user_init_deepRetn(void)
     // irq_enable();
 	module_wakeup_chip_control_init();
     user_fifo_init();
-    init_bind_state();
+    init_all_para();
 }
 #endif

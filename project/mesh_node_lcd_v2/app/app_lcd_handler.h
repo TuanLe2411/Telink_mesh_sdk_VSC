@@ -2,6 +2,5 @@
 #define __APP_LCD_HANDLER_H__
 #include "proj/common/types.h"
 
-extern void uart_lcd_handler_data(u8 *para, int len);
-    
+extern void module_handler_scene_btn_onclick(u8 btn_onclick, u8 btn_mode); 
 #endif

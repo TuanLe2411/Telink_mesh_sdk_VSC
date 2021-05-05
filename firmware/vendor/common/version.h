@@ -87,7 +87,7 @@ format: please refer to spec "4.2.1.1 Composition Data Page 0"
     #elif (__PROJECT_NODE_SWITCH__)
         #define MESH_PID_SEL		(PID_SWITCH)
         #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
-    #elif (__PROJECT_NODE_LCD__)
+    #elif (__PROJECT_NODE_LCD__ || __PROJECT_NODE_LCD_V2__)
         #define MESH_PID_SEL		(PID_LCD)
         #define MESH_VID		    FW_VERSION_TELINK_RELEASE       // user can redefine
     #else
