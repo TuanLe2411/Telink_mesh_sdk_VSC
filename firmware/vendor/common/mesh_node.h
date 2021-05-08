@@ -936,7 +936,6 @@ typedef struct{
 typedef struct {
 	u16 header;
 	u8 bid;
-    u8 mid;
     u16 sceneId; 
 	u16 appId;
 }model_btn_scene_receive_t;
@@ -944,14 +943,12 @@ typedef struct {
 typedef struct {
 	u16 header;
 	u8 bid;
-	u8 mid;
 	u16 sceneId; 
 	u16 appId;
 }model_btn_scene_response_t;
 
 typedef struct {
 	u8 bid;
-	u8 mid;
 }model_btn_scene_remove_t;
 
 typedef struct {
@@ -961,7 +958,6 @@ typedef struct {
 typedef struct {
 	u8 writted;
 	u8 bid;
-    u8 mid;
     u16 sceneId; 
 	u16 appId;
 }model_btn_scene_save_t;

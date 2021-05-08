@@ -7,7 +7,7 @@
 #include "vendor/common/scene.h"
 u16 find_sceneId_from_btn_onclick(u8 btn_onclick, u8 btn_mode){
     for(int i = 0; i< MAX_SCENE_SAVE; i++){
-        if((model_vd_btn_scene.btn[0][i].bid == btn_onclick)&&(model_vd_btn_scene.btn[0][i].mid == btn_mode))
+        if(model_vd_btn_scene.btn[0][i].bid == btn_onclick)
         {
             return model_vd_btn_scene.btn[0][i].sceneId;
         }
@@ -17,7 +17,7 @@ u16 find_sceneId_from_btn_onclick(u8 btn_onclick, u8 btn_mode){
 
 u16 find_appId_from_btn_onclick(u8 btn_onclick, u8 btn_mode){
     for(int i = 0; i< MAX_SCENE_SAVE; i++){
-        if((model_vd_btn_scene.btn[0][i].bid == btn_onclick)&&(model_vd_btn_scene.btn[0][i].mid == btn_mode))
+        if(model_vd_btn_scene.btn[0][i].bid == btn_onclick)
         {
             return model_vd_btn_scene.btn[0][i].appId;
         }
@@ -29,7 +29,6 @@ void module_send_btn_onclick_to_hc(u8 btn_onclick, u8 btn_mode, u16 sceneId, u16
     btn_onclick_data_status btn_onclick_status = {0};
     btn_onclick_status.header = REMOTE_AC_MODULE_TYPE;
     btn_onclick_status.bid = btn_onclick;
-    btn_onclick_status.mid = btn_mode;
     btn_onclick_status.sceneId = sceneId;
     btn_onclick_status.appId = appId;
     #if 1

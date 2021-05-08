@@ -43,8 +43,8 @@ model_vendor_btn_scene_t 	model_vd_btn_scene;
 #endif
 //------------BTN_SCENE_BEGIN
 	//--------------BTN_SCENE_HEADER_OPCODE
-	#define BTN_SAVE_CLICK_MODE			0x0101
-	#define BTN_DELETE_CLICK_MODE		0x0102
+	#define BTN_SAVE_CLICK_MODE			0x010A
+	#define BTN_DELETE_CLICK_MODE		0x020A
 	//--------------BTN_ACTION_STATE
 	#define BTN_ACTION_SUCCESS			0
 	#define BTN_ACTION_FAILURE			-1	
@@ -136,13 +136,15 @@ int vd_light_onoff_st_publish(u8 light_idx)
 
 //---------------BTN_SCENE_BEGIN
 #if VD_BTN_SCENE_EN
+
+#include "../project/mesh_node_lcd_v2/app/app_serial.h"
+
 int btn_scene_set_sts(int state, u16 ele_adr, u16 dst_adr, model_btn_scene_receive_t* btn_set){
 	model_btn_scene_response_t state_res = {0};
 	
 	if(state == BTN_ACTION_SUCCESS){
 		state_res.header = btn_set->header;
 		state_res.bid = btn_set->bid;
-		state_res.mid = btn_set->mid;
 		state_res.sceneId = btn_set->sceneId;
 		state_res.appId = btn_set->appId;
 		mesh_tx_cmd_rsp(VD_BTN_SCENE_STATUS, (u8 *)&state_res, sizeof(state_res), ele_adr, dst_adr, 0, 0);
@@ -161,23 +163,22 @@ int get_current_written_btn_scene_location(){
 	return count;
 }
 
-int get_btn_scene_loc_by_bid_and_mid(u8 btn, u8 mod, int wn){
+int get_btn_scene_loc_by_bid(u8 btn, int wn){
 	int count = 0;
 	for(int i = 0; i< wn; i++){
-		if((model_vd_btn_scene.btn[0][i].bid == btn)&&(model_vd_btn_scene.btn[0][i].mid == mod)) break;
+		if(model_vd_btn_scene.btn[0][i].bid == btn) break;
 		count = count + 1;
 	}
 	return count;
 }
 
 void save_btn_scene_into_model(model_btn_scene_receive_t* btn_set, int *loc, mesh_cb_fun_par_t *cb_par){
-	int save_loc = get_btn_scene_loc_by_bid_and_mid(btn_set->bid, btn_set->mid, *loc);
+	int save_loc = get_btn_scene_loc_by_bid(btn_set->bid, *loc);
 	if(*loc > MAX_SCENE_SAVE){
 		return ;
 	}
 	model_vd_btn_scene.btn[0][save_loc].writted = 0x01;
 	model_vd_btn_scene.btn[0][save_loc].bid = btn_set->bid;
-	model_vd_btn_scene.btn[0][save_loc].mid = btn_set->mid;
 	model_vd_btn_scene.btn[0][save_loc].sceneId = btn_set->sceneId;
 	model_vd_btn_scene.btn[0][save_loc].appId = btn_set->appId;
 	if(save_loc == *loc){
@@ -195,7 +196,7 @@ void del_btn_scene_into_model(model_btn_scene_receive_t* btn_set, int *loc, mesh
 	if(*loc > MAX_SCENE_SAVE){
 		return ;
 	}
-	int del_loc = get_btn_scene_loc_by_bid_and_mid(btn_set->bid, btn_set->mid, *loc);
+	int del_loc = get_btn_scene_loc_by_bid(btn_set->bid, *loc);
 	if(del_loc == *loc){
 		return ;
 	}
@@ -207,12 +208,13 @@ void del_btn_scene_into_model(model_btn_scene_receive_t* btn_set, int *loc, mesh
 }
 
 int is_btn_scene_set_data_valid(model_btn_scene_receive_t* btn_set){
-
 	return 1;
 }
 
 int cb_vd_btn_scene_set(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
 	model_btn_scene_receive_t* btn_set = (model_btn_scene_receive_t *)par;
+	u8 temp[2] = {par[2], par[3]};
+	u8 humi[2] = {par[4], par[5]};
 	if(!is_btn_scene_set_data_valid(btn_set)){
 		return 0;
 	}
@@ -230,6 +232,12 @@ int cb_vd_btn_scene_set(u8 *par, int par_len, mesh_cb_fun_par_t *cb_par){
 			break;
 		case BTN_DELETE_CLICK_MODE:
 			del_btn_scene_into_model(btn_set, &wn, cb_par);
+			break;
+		case 0x040A:
+			module_update_time_hmi(par[2], par[3]);
+			break;
+		case 0x030A:
+			module_update_sensor_para_hmi(temp, humi);
 			break;
 		default:
 			break;
@@ -1041,6 +1049,13 @@ void module_response_type_dv_to_gw(mess_type_dev_rceiv *rceiv, mesh_cb_fun_par_t
 		t.type = DV_TYPE_SMOKE_SENSOR;
 		t.feature = DV_FEATURE_SMOKE_SENSOR;
 		t.app = DV_APP_SMOKE_SENSOR;
+	#endif
+
+	#if (__PROJECT_NODE_LCD_V2__)
+		t.header = DV_RES_TD;
+		t.type = 0x02;
+		t.feature = 0x03;
+		t.app = 0x03;
 	#endif
 		SendOpParaDebug(cb_par->adr_src, 0, 0xE1, (u8 *)&t, sizeof(t));
 		break;

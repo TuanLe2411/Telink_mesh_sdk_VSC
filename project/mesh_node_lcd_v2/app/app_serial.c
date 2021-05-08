@@ -73,8 +73,10 @@ void uart_handler_by_act(u8 *para, int len){
 	switch (act)
 	{
 	case LCD_CALL_SCENE_CMD:
-		module_handler_scene_btn_onclick(para[7], para[8]);
+		module_handler_scene_btn_onclick(para[7]);
 		break;
+	case LCD_RESET_MODULE_CMD:
+		module_on_reset();
 	default:
 		break;
 	}
@@ -137,4 +139,65 @@ int rx_from_uart_cb(void){
 		}
 	}
 	return 0;
+}
+
+void module_update_time_hmi(u8 h, u8 m){
+	u8 para[UART_MAX_LEN];
+	u8 len = 0;
+
+	para[0] = UART_HEADER_DATA_0;
+	len = len + 1;
+	para[1] = UART_HEADER_DATA_1;
+	len = len + 1;
+	para[2] = UART_MODULE_TO_HMI;
+	len = len + 1;
+	para[3] = UART_TYPE_CMD;
+	len = len + 1;
+	para[4] = LCD_UPDTE_TIME_CMD >> 8;
+	len = len + 1;
+	para[5] = LCD_UPDTE_TIME_CMD & 0x00ff;
+	len = len + 1;
+	para[6] = 0x02;
+	len = len + 1;
+	para[7] =	h; 
+	len = len + 1;
+	para[8] = m;
+	len = len + 1;
+	para[9] = create_crc_check(para);
+	len = len + 1;
+	
+	uart_print_data(para, len, 0, 0);
+	return;
+}
+void module_update_sensor_para_hmi(u8 *t, u8 *h){
+	u8 para[UART_MAX_LEN];
+	u8 len = 0;
+
+	para[0] = UART_HEADER_DATA_0;
+	len = len + 1;
+	para[1] = UART_HEADER_DATA_1;
+	len = len + 1;
+	para[2] = UART_MODULE_TO_HMI;
+	len = len + 1;
+	para[3] = UART_TYPE_CMD;
+	len = len + 1;
+	para[4] = LCD_UPDATE_SENSOR_DATA_CMD >> 8;
+	len = len + 1;
+	para[5] = LCD_UPDATE_SENSOR_DATA_CMD & 0x00ff;
+	len = len + 1;
+	para[6] = 0x04;
+	len = len + 1;
+	para[7] = t[0]; 
+	len = len + 1;
+	para[8] = t[1];
+	len = len + 1;
+	para[9] = h[0]; 
+	len = len + 1;
+	para[10] = h[1];
+	len = len + 1;
+	para[11] = create_crc_check(para);
+	len = len + 1;
+	
+	uart_print_data(para, len, 0, 0);
+	return;
 }

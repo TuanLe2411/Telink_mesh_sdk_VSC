@@ -11,7 +11,6 @@
 typedef struct btn_onclick_data_status{
     u16 header;
     u8 bid;
-    u8 mid;
     u16 sceneId; 
     u16 appId;
 }btn_onclick_data_status;
